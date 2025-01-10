@@ -94,7 +94,7 @@ public:
 	void				sf45_get_and_handle_request(const int payload_length, const SF_SERIAL_CMD msg_id);
 	void				sf45_send(uint8_t msg_id, bool r_w, int32_t *data, uint8_t data_len);
 	uint16_t			sf45_format_crc(uint16_t crc, uint8_t data_value);
-	void				sf45_process_replies(float *data);
+	void				sf45_process_replies();
 	uint8_t				sf45_convert_angle(const int16_t yaw);
 	float				sf45_wrap_360(float f);
 
