@@ -652,7 +652,7 @@ void SF45LaserSerial::sf45_process_replies(float *distance_m)
 					vehicle_attitude_s vehicle_attitude;
 
 					if (_vehicle_attitude_sub.copy(&vehicle_attitude)) {
-						_vehicle_attitude = Quatf(vehicle_attitude.q);
+						_vehicle_attitude = matrix::Quatf(vehicle_attitude.q);
 					}
 				}
 
