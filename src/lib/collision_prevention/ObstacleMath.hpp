@@ -42,6 +42,6 @@ namespace ObstacleMath
  * @param yaw orientation of the measurement on the body horizontal plane
  * @param q_world_vehicle vehicle attitude quaternion
  */
-void project_distance_on_horizontal_plane(float &distance, const int16_t yaw, const matrix::Quatf &q_world_vehicle);
+void project_distance_on_horizontal_plane(float &distance, const float yaw, const matrix::Quatf &q_world_vehicle);
 
 } // ObstacleMath

@@ -39,7 +39,7 @@ using namespace matrix;
 namespace ObstacleMath
 {
 
-void project_distance_on_horizontal_plane(float &distance, const int16_t yaw, const matrix::Quatf &q_world_vehicle)
+void project_distance_on_horizontal_plane(float &distance, const float yaw, const matrix::Quatf &q_world_vehicle)
 {
 	const Quatf q_vehicle_sensor(Quatf(cosf(yaw / 2.f), 0.f, 0.f, sinf(yaw / 2.f)));
 	const Quatf q_world_sensor = q_world_vehicle * q_vehicle_sensor;
