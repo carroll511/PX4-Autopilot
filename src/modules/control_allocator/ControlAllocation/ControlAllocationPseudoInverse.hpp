@@ -46,6 +46,12 @@
 #pragma once
 
 #include "ControlAllocation.hpp"
+#include <uORB/uORB.h>
+// #include <uORB/topics/rc_channels.h>
+#include <uORB/topics/input_rc.h>
+#include <uORB/Publication.hpp>
+#include <uORB/topics/debug_value.h> // DebugValue 토픽 사용
+#include <parameters/param.h>
 
 class ControlAllocationPseudoInverse: public ControlAllocation
 {
@@ -57,6 +63,16 @@ public:
 	void setEffectivenessMatrix(const matrix::Matrix<float, NUM_AXES, NUM_ACTUATORS> &effectiveness,
 				    const ActuatorVector &actuator_trim, const ActuatorVector &linearization_point, int num_actuators,
 				    bool update_normalization_scale) override;
+	// 클래스 함수 추가
+	void initializeRCInput();
+	bool updateRCInput();
+	void enable_mix_update();
+
+	// 클래스 멤버 변수 및 함수 추가
+	int _rc_sub = -1; // RC 채널 구독자
+	// rc_channels_s _rc_data {}; // RC 채널 데이터
+	input_rc_s _rc_data {};
+	int _prev_rc = 0;
 
 protected:
 	matrix::Matrix<float, NUM_ACTUATORS, NUM_AXES> _mix;
@@ -73,4 +89,9 @@ private:
 	void normalizeControlAllocationMatrix();
 	void updateControlAllocationMatrixScale();
 	bool _normalization_needs_update{false};
+
+
 };
+
+// extern uORB::Publication <debug_value_s> _debug_value_pub;
+// extern debug_value_s debug_msg;
