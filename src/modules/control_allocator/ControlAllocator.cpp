@@ -50,24 +50,24 @@ using namespace matrix;
 using namespace time_literals;
 
 const float ControlAllocator::values_30[12] = {
-	0.06f, 0.19f, -0.47f,
-	-0.16f, -0.19f, -0.47f,
-	0.06f, -0.19f, -0.47f,
-	-0.16f, 0.19f, -0.47f
+	0.05f, 0.19f, -0.54f,
+	-0.17f, -0.19f, -0.54f,
+	0.05f, -0.19f, -0.54f,
+	-0.17f, 0.19f, -0.54f
 };
 
 const float ControlAllocator::values_60[12] = {
-	-0.16f, 0.19f, -0.33f,
-	-0.39f, -0.19f, -0.33f,
-	-0.16f, -0.19f, -0.33f,
-	-0.39f, 0.19f, -0.33f
+	-0.29f, 0.19f, -0.23f,
+	-0.52f, -0.19f, -0.23f,
+	-0.29f, -0.19f, -0.23f,
+	-0.52f, 0.19f, -0.23f
 };
 
 const float ControlAllocator::values_90[12] = {
-	-0.23f, 0.19f, -0.07f,
-	-0.46f, -0.19f, -0.07f,
-	-0.23f, -0.19f, -0.07f,
-	-0.46f, 0.19f, -0.07f
+	-0.30f, 0.19f, -0.06f,
+	-0.53f, -0.19f, -0.06f,
+	-0.30f, -0.19f, -0.06f,
+	-0.53f, 0.19f, -0.06f
 };
 
 const char *param_names[12] = {
@@ -422,7 +422,7 @@ ControlAllocator::Run()
 
 	if (_input_rc_sub.update(&input_rc)) {
 		// read channel 5
-		uint16_t rc_value = _last_rc_input.values[4];
+		uint16_t rc_value = input_rc.values[4];
 
 		if (rc_value < 1200) {
 			selected_values = values_30;
