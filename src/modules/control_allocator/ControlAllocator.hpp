@@ -78,6 +78,8 @@
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/failure_detector_status.h>
 
+#include <uORB/topics/input_rc.h>
+
 class ControlAllocator : public ModuleBase<ControlAllocator>, public ModuleParams, public px4::ScheduledWorkItem
 {
 public:
@@ -175,6 +177,8 @@ private:
 	uORB::Subscription _vehicle_torque_setpoint1_sub{ORB_ID(vehicle_torque_setpoint), 1};  /**< vehicle torque setpoint subscription (2. instance) */
 	uORB::Subscription _vehicle_thrust_setpoint1_sub{ORB_ID(vehicle_thrust_setpoint), 1};	 /**< vehicle thrust setpoint subscription (2. instance) */
 
+	uORB::Subscription _input_rc_sub{ORB_ID(input_rc)};
+
 	// Outputs
 	uORB::PublicationMulti<control_allocator_status_s> _control_allocator_status_pub[2] {ORB_ID(control_allocator_status), ORB_ID(control_allocator_status)};
 
@@ -212,4 +216,9 @@ private:
 		(ParamInt<px4::params::CA_R_REV>) _param_r_rev
 	)
 
+	input_rc_s _last_rc_input;
+
+	static const float values_30[12];
+	static const float values_60[12];
+	static const float values_90[12];
 };

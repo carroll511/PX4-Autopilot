@@ -316,3 +316,30 @@ ActuatorEffectivenessRotors::getEffectivenessMatrix(Configuration &configuration
 
 	return addActuators(configuration);
 }
+
+void
+ActuatorEffectivenessRotors::updateRotorPositions(const float *positions, int num_rotors)
+{
+	PX4_INFO("ActuatorEffectivenessRotors::updateRotorPositions() called, num_rotors=%d", num_rotors);
+
+	if (num_rotors > NUM_ROTORS_MAX) {
+		PX4_ERR("Too many rotors");
+		return;
+	}
+
+	for (int i = 0; i < num_rotors; ++i) {
+		_geometry.rotors[i].position(0) = positions[i * 3];
+		_geometry.rotors[i].position(1) = positions[i * 3 + 1];
+		_geometry.rotors[i].position(2) = positions[i * 3 + 2];
+
+		PX4_INFO("updateRotorPositions(): rotor[%d] -> [%.3f %.3f %.3f]",
+		         i,
+		         (double)_geometry.rotors[i].position(0),
+		         (double)_geometry.rotors[i].position(1),
+		         (double)_geometry.rotors[i].position(2));
+
+		param_set(_param_handles[i].position_x, &positions[i * 3]);
+		param_set(_param_handles[i].position_y, &positions[i * 3 + 1]);
+		param_set(_param_handles[i].position_z, &positions[i * 3 + 2]);
+	}
+}

@@ -49,10 +49,32 @@
 using namespace matrix;
 using namespace time_literals;
 
+const float ControlAllocator::values_30[12] = {
+	0.06f, 0.19f, -0.47f,
+	-0.16f, -0.19f, -0.47f,
+	0.06f, -0.19f, -0.47f,
+	-0.16f, 0.19f, -0.47f
+};
+
+const float ControlAllocator::values_60[12] = {
+	-0.16f, 0.19f, -0.33f,
+	-0.39f, -0.19f, -0.33f,
+	-0.16f, -0.19f, -0.33f,
+	-0.39f, 0.19f, -0.33f
+};
+
+const float ControlAllocator::values_90[12] = {
+	-0.23f, 0.19f, -0.07f,
+	-0.46f, -0.19f, -0.07f,
+	-0.23f, -0.19f, -0.07f,
+	-0.46f, 0.19f, -0.07f
+};
+
 ControlAllocator::ControlAllocator() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::rate_ctrl),
-	_loop_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": cycle"))
+	_loop_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")),
+	_last_rc_input{}
 {
 	_control_allocator_status_pub[0].advertise();
 	_control_allocator_status_pub[1].advertise();
@@ -383,10 +405,55 @@ ControlAllocator::Run()
 		}
 	}
 
+	// ---------------------
+	// RC input update check
+	// ---------------------
+	input_rc_s input_rc;
+
+	if (_input_rc_sub.update(&input_rc)) {
+		if (input_rc.values[4] != _last_rc_input.values[4]) {
+			do_update = true;
+			PX4_INFO("RC channel4 changed from %u to %u -> will check rotor config",
+                     (unsigned)_last_rc_input.values[4], (unsigned)input_rc.values[4]);
+		}
+		_last_rc_input = input_rc;
+	}
+	// ---------------------
+
+
 	if (do_update) {
 		_last_run = now;
 
 		check_for_motor_failures();
+
+		// ---------------------------------------
+		// update rotor position based on RC input
+		// ---------------------------------------
+		static float const *previous_selected_values = nullptr;
+		float const *selected_values = nullptr;
+
+		// read channel 5
+		uint16_t rc_value = _last_rc_input.values[4];
+
+		if (rc_value < 1200) {
+			selected_values = values_30;
+			PX4_INFO("selected_values = values_30");
+		}
+		else if (rc_value < 1700) {
+			selected_values = values_60;
+			PX4_INFO("selected_values = values_60");
+		}
+		else {
+			selected_values = values_90;
+			PX4_INFO("selected_values = values_90");
+		}
+		if (selected_values != previous_selected_values) {
+			PX4_INFO("RC channel4 range changed -> updateRotorPositions() with new config");
+			_actuator_effectiveness->updateRotorPositions(selected_values, 4);
+			PX4_INFO("After calling updateRotorPositions()");
+			previous_selected_values = selected_values;
+		}
+		// ---------------------------------------
 
 		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
 

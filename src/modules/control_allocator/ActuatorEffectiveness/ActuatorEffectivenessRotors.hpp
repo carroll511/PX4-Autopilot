@@ -130,6 +130,8 @@ public:
 	uint32_t getUpwardsMotors() const;
 	uint32_t getForwardsMotors() const;
 
+	void updateRotorPositions(const float *positions, int num_rotors) override;
+
 private:
 	void updateParams() override;
 	const AxisConfiguration _axis_config;
