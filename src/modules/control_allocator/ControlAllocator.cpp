@@ -41,6 +41,13 @@
 
 #include "ControlAllocator.hpp"
 
+#include <cstring>
+#include <px4_log.h>
+#include <uORB/uORB.h>
+#include <uORB/Publication.hpp>
+#include <cmath>  // std::fabs 사용
+#include <uORB/topics/debug_value.h> // DebugValue 토픽 사용
+
 #include <drivers/drv_hrt.h>
 #include <circuit_breaker/circuit_breaker.h>
 #include <mathlib/math/Limits.hpp>
@@ -48,6 +55,52 @@
 
 using namespace matrix;
 using namespace time_literals;
+
+const float EPSILON = 1e-6; // 작은 차이를 허용하는 epsilon 값 정의
+uORB::Publication <debug_value_s> _CA_debug_value_pub{ORB_ID(debug_value)};
+debug_value_s CA_debug_msg = {};
+
+void ControlAllocator::initializeRCInput()
+{
+	// CA_debug_msg.timestamp = hrt_absolute_time();  // Get the current timestamp in microseconds
+	// CA_debug_msg.ind = 8;                         // Set the index (for example)
+	// CA_debug_msg.value = 8.0f;                // Set the value to send as the debug output
+	// _CA_debug_value_pub.publish(debug_msg);       // Publish the message
+
+	_rc_sub = orb_subscribe(ORB_ID(input_rc));
+}
+
+bool ControlAllocator::updateRCInput()
+{
+	CA_debug_msg.timestamp = hrt_absolute_time();  // Get the current timestamp in microseconds
+	CA_debug_msg.ind = 7;                         // Set the index (for example)
+	CA_debug_msg.value = 7.0f;                   // Set the value to send as the debug output
+	_CA_debug_value_pub.publish(CA_debug_msg);       // Publish the message
+
+    if (_rc_sub < 0) {
+        PX4_WARN("RC subscription not initialized!");
+    }
+
+    bool updated = false;
+    orb_check(_rc_sub, &updated); // 업데이트 확인
+
+    if (updated) {
+        orb_copy(ORB_ID(input_rc), _rc_sub, &_rc_data); // 데이터 복사
+    }
+
+
+	if (std::abs(static_cast<int>(_rc_data.values[4])-_prev_rc) > EPSILON) {
+		_prev_rc = _rc_data.values[4]; // 이전 값 저장
+		PX4_INFO("RC Updated");
+		return true;
+	}
+	else {
+		_prev_rc = _rc_data.values[4]; // 이전 값 저장
+		PX4_INFO("RC unchanged");
+
+		return false;
+	}
+}
 
 ControlAllocator::ControlAllocator() :
 	ModuleParams(nullptr),
@@ -369,6 +422,14 @@ ControlAllocator::Run()
 
 		do_update = true;
 		_timestamp_sample = vehicle_torque_setpoint.timestamp_sample;
+
+	}
+
+	// Run allocator on RC changes
+	if (updateRCInput()) {
+		PX4_INFO("RC input changed");
+		do_update = true;
+		_timestamp_sample = hrt_absolute_time();
 
 	}
 

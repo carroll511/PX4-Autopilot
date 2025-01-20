@@ -77,6 +77,10 @@
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/failure_detector_status.h>
+#include <uORB/topics/input_rc.h>
+#include <parameters/param.h>
+#include <uORB/uORB.h>
+
 
 class ControlAllocator : public ModuleBase<ControlAllocator>, public ModuleParams, public px4::ScheduledWorkItem
 {
@@ -108,6 +112,16 @@ public:
 	void Run() override;
 
 	bool init();
+
+	// 클래스 함수 추가
+	void initializeRCInput();
+	bool updateRCInput();
+
+	// 클래스 멤버 변수 및 함수 추가
+	int _rc_sub = -1; // RC 채널 구독자
+	// rc_channels_s _rc_data {}; // RC 채널 데이터
+	input_rc_s _rc_data {};
+	int _prev_rc = 0;
 
 private:
 
