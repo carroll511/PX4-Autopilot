@@ -410,11 +410,27 @@ ControlAllocator::Run()
 	// ---------------------
 	input_rc_s input_rc;
 
+	static float const *previous_selected_values = nullptr;
+	float const *selected_values = nullptr;
+
 	if (_input_rc_sub.update(&input_rc)) {
-		if (input_rc.values[4] != _last_rc_input.values[4]) {
+		// read channel 5
+		uint16_t rc_value = _last_rc_input.values[4];
+
+		if (rc_value < 1200) {
+			selected_values = values_30;
+		} else if (rc_value < 1700) {
+			selected_values = values_60;
+		} else {
+			selected_values = values_90;
+		}
+
+		if ((input_rc.values[4] != _last_rc_input.values[4]) && (selected_values != previous_selected_values)) {
+			PX4_INFO("RC input changed: Updating rotor positions. Value changed from %u to %u",
+             			_last_rc_input.values[4], input_rc.values[4]);
+			_actuator_effectiveness->updateRotorPositions(selected_values, 4);
+			previous_selected_values = selected_values;
 			do_update = true;
-			PX4_INFO("RC channel4 changed from %u to %u -> will check rotor config",
-                     (unsigned)_last_rc_input.values[4], (unsigned)input_rc.values[4]);
 		}
 		_last_rc_input = input_rc;
 	}
@@ -426,36 +442,10 @@ ControlAllocator::Run()
 
 		check_for_motor_failures();
 
-		// ---------------------------------------
 		// update rotor position based on RC input
-		// ---------------------------------------
-		static float const *previous_selected_values = nullptr;
-		float const *selected_values = nullptr;
+		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::CONFIGURATION_UPDATE);
 
-		// read channel 5
-		uint16_t rc_value = _last_rc_input.values[4];
-
-		if (rc_value < 1200) {
-			selected_values = values_30;
-			PX4_INFO("selected_values = values_30");
-		}
-		else if (rc_value < 1700) {
-			selected_values = values_60;
-			PX4_INFO("selected_values = values_60");
-		}
-		else {
-			selected_values = values_90;
-			PX4_INFO("selected_values = values_90");
-		}
-		if (selected_values != previous_selected_values) {
-			PX4_INFO("RC channel4 range changed -> updateRotorPositions() with new config");
-			_actuator_effectiveness->updateRotorPositions(selected_values, 4);
-			PX4_INFO("After calling updateRotorPositions()");
-			previous_selected_values = selected_values;
-		}
-		// ---------------------------------------
-
-		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
+		//update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
 
 		// Set control setpoint vector(s)
 		matrix::Vector<float, NUM_AXES> c[ActuatorEffectiveness::MAX_NUM_MATRICES];

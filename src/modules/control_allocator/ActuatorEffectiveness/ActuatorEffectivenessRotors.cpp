@@ -327,6 +327,16 @@ ActuatorEffectivenessRotors::updateRotorPositions(const float *positions, int nu
 		return;
 	}
 
+	if (positions == nullptr) {
+		PX4_ERR("positions is nullptr");
+		return;
+	}
+
+	if (_geometry.rotors == nullptr) {
+		PX4_ERR("_geometry.rotors is nullptr");
+		return;
+	}
+
 	for (int i = 0; i < num_rotors; ++i) {
 		_geometry.rotors[i].position(0) = positions[i * 3];
 		_geometry.rotors[i].position(1) = positions[i * 3 + 1];
