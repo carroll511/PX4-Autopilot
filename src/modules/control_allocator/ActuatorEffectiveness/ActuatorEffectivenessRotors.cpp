@@ -317,39 +317,22 @@ ActuatorEffectivenessRotors::getEffectivenessMatrix(Configuration &configuration
 	return addActuators(configuration);
 }
 
-void
-ActuatorEffectivenessRotors::updateRotorPositions(const float *positions, int num_rotors)
-{
-	PX4_INFO("ActuatorEffectivenessRotors::updateRotorPositions() called, num_rotors=%d", num_rotors);
-
-	if (num_rotors > NUM_ROTORS_MAX) {
-		PX4_ERR("Too many rotors");
-		return;
-	}
-
-	if (positions == nullptr) {
-		PX4_ERR("positions is nullptr");
-		return;
-	}
-
-	if (_geometry.rotors == nullptr) {
-		PX4_ERR("_geometry.rotors is nullptr");
-		return;
-	}
-
-	for (int i = 0; i < num_rotors; ++i) {
-		_geometry.rotors[i].position(0) = positions[i * 3];
-		_geometry.rotors[i].position(1) = positions[i * 3 + 1];
-		_geometry.rotors[i].position(2) = positions[i * 3 + 2];
-
-		PX4_INFO("updateRotorPositions(): rotor[%d] -> [%.3f %.3f %.3f]",
-		         i,
-		         (double)_geometry.rotors[i].position(0),
-		         (double)_geometry.rotors[i].position(1),
-		         (double)_geometry.rotors[i].position(2));
-
-		param_set(_param_handles[i].position_x, &positions[i * 3]);
-		param_set(_param_handles[i].position_y, &positions[i * 3 + 1]);
-		param_set(_param_handles[i].position_z, &positions[i * 3 + 2]);
-	}
-}
+//void
+//ActuatorEffectivenessRotors::updateRotorPositions(const float *positions, int num_rotors)
+//{
+//	for (int i = 0; i < 12; i++) {
+//		param_t param_handle = param_find(param_names[i]);
+//
+//		if (param_handle != PARAM_INVALID) {
+//			int result = param_set(param_handle, &positions[i]);
+//
+//			if (result == PX4_OK) {
+//				PX4_INFO("Parameter %s updated to %.2f", param_names[i], double(positions[i]));
+//			} else {
+//				PX4_WARN("Failed to update parameter %s", param_names[i]);
+//			}
+//		} else {
+//			PX4_WARN("Parameter %s not found", param_names[i]);
+//		}
+//	}
+//}

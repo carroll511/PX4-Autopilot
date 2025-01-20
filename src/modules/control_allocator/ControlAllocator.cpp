@@ -70,6 +70,13 @@ const float ControlAllocator::values_90[12] = {
 	-0.46f, 0.19f, -0.07f
 };
 
+const char *param_names[12] = {
+	"CA_ROTOR0_PX", "CA_ROTOR0_PY", "CA_ROTOR0_PZ",
+	"CA_ROTOR1_PX", "CA_ROTOR1_PY", "CA_ROTOR1_PZ",
+	"CA_ROTOR2_PX", "CA_ROTOR2_PY", "CA_ROTOR2_PZ",
+	"CA_ROTOR3_PX", "CA_ROTOR3_PY", "CA_ROTOR3_PZ"
+};
+
 ControlAllocator::ControlAllocator() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::rate_ctrl),
@@ -428,7 +435,21 @@ ControlAllocator::Run()
 		if ((input_rc.values[4] != _last_rc_input.values[4]) && (selected_values != previous_selected_values)) {
 			PX4_INFO("RC input changed: Updating rotor positions. Value changed from %u to %u",
              			_last_rc_input.values[4], input_rc.values[4]);
-			_actuator_effectiveness->updateRotorPositions(selected_values, 4);
+
+			for (int i = 0; i < 12; i++) {
+				param_t param_handle = param_find(param_names[i]);
+				if (param_handle != PARAM_INVALID) {
+					int result = param_set(param_handle, &selected_values[i]);
+
+					if (result == PX4_OK) {
+						PX4_INFO("Parameter %s updated to %.2f", param_names[i], double(selected_values[i]));
+					} else {
+						PX4_ERR("Failed to update parameter %s", param_names[i]);
+					}
+				} else {
+					PX4_ERR("Parameter %s not found", param_names[i]);
+				}
+			}
 			previous_selected_values = selected_values;
 			do_update = true;
 		}

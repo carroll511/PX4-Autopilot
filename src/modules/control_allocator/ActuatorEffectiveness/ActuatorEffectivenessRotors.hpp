@@ -46,6 +46,7 @@
 #include <px4_platform_common/module_params.h>
 #include <uORB/Subscription.hpp>
 #include <uORB/SubscriptionInterval.hpp>
+//#include <parameters/param.h>
 
 class ActuatorEffectivenessTilts;
 
@@ -130,7 +131,7 @@ public:
 	uint32_t getUpwardsMotors() const;
 	uint32_t getForwardsMotors() const;
 
-	void updateRotorPositions(const float *positions, int num_rotors) override;
+	//void updateRotorPositions(const float *positions, int num_rotors) override;
 
 private:
 	void updateParams() override;
