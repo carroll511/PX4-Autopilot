@@ -336,6 +336,7 @@ ControlAllocator::Run()
 
 	// Check if parameters have changed
 	if (_parameter_update_sub.updated() && !_armed) {
+	//if (_parameter_update_sub.updated() && _armed) {
 		// clear update
 		parameter_update_s param_update;
 		_parameter_update_sub.copy(&param_update);
@@ -443,6 +444,17 @@ ControlAllocator::Run()
 
 					if (result == PX4_OK) {
 						PX4_INFO("Parameter %s updated to %.2f", param_names[i], double(selected_values[i]));
+
+						// clear update
+						parameter_update_s param_update;
+						_parameter_update_sub.copy(&param_update);
+
+						if (_handled_motor_failure_bitmask == 0) {
+							// We don't update the geometry after an actuator failure, as it could lead to unexpected results
+							// (e.g. a user could add/remove motors, such that the bitmask isn't correct anymore)
+							updateParams();
+							parameters_updated();
+						}
 					} else {
 						PX4_ERR("Failed to update parameter %s", param_names[i]);
 					}
