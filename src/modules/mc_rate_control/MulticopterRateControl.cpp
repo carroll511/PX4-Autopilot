@@ -214,6 +214,7 @@ MulticopterRateControl::Run()
 			}
 
 			// run rate controller
+			// rc_input value should be sended to rate controller
 			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
 
 			// publish rate controller status

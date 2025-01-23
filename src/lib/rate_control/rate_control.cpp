@@ -40,6 +40,10 @@
 
 using namespace matrix;
 
+matrix::Vector3f ff_90{0.0f, -0.4f, 0.0f};
+matrix::Vector3f ff_60{0.0f, 0.0f, 0.0f};
+matrix::Vector3f ff_30{0.0f, 0.0f, 0.0f};
+
 void RateControl::setGains(const Vector3f &P, const Vector3f &I, const Vector3f &D)
 {
 	_gain_p = P;
@@ -74,8 +78,31 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 	// angular rates error
 	Vector3f rate_error = rate_sp - rate;
 
+	uint16_t rc_value = 0;
+	input_rc_s input_rc;
+
+	if (_input_rc_sub.update(&input_rc)) {
+		rc_value = input_rc.values[4];
+
+		if (rc_value != _last_rc_input.values[4]) {
+			_updateFF = true;
+			_last_rc_input = input_rc;
+		}
+	}
+
+	if (_updateFF) {
+		if (rc_value < 1200) {
+			_feed_forward = ff_30;
+		} else if (rc_value < 1700) {
+			_feed_forward = ff_60;
+		} else {
+			_feed_forward = ff_90;
+		}
+	}
+
 	// PID control with feed forward
-	const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp);
+	const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp) + _feed_forward;
+	PX4_INFO("torque: %f, %f, %f", (double)torque(0), (double)torque(1), (double)torque(2));
 
 	// update integral only if we are not landed
 	if (!landed) {

@@ -44,6 +44,9 @@
 #include <mathlib/mathlib.h>
 #include <uORB/topics/rate_ctrl_status.h>
 
+#include <uORB/topics/input_rc.h>
+#include <uORB/Subscription.hpp>
+
 class RateControl
 {
 public:
@@ -124,4 +127,12 @@ private:
 	// Feedback from control allocation
 	matrix::Vector<bool, 3> _control_allocator_saturation_negative;
 	matrix::Vector<bool, 3> _control_allocator_saturation_positive;
+
+	// add rc input topic
+	uORB::Subscription _input_rc_sub{ORB_ID(input_rc)};
+	input_rc_s              _last_rc_input;
+
+	// Feedforward term for rate control
+	matrix::Vector3f _feed_forward;
+	bool _updateFF;
 };
