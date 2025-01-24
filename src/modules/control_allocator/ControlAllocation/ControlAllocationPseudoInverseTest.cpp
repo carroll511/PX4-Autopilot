@@ -167,20 +167,8 @@ TEST(ControlAllocationTest, PseudoInverseAndNormalization)
 	ASSERT_TRUE(success) << "Psuedo-inverse computation failed";
 
 	std::cout << "ex_Pesudo-inverse: " << ex_pseudo_inverse << std::endl;
-	for (size_t i = 0; i < num_actuators; ++i) {
-		for (size_t j = 0; j < num_controls; ++j) {
-			std::cout << ex_pseudo_inverse(i, j) << " ";
-		}
-		std::cout << std::endl;
-	}
 
 	std::cout << "Pesudo-inverse: " << pseudo_inverse << std::endl;
-	for (size_t i = 0; i < num_actuators; ++i) {
-		for (size_t j = 0; j < num_controls; ++j) {
-			std::cout << pseudo_inverse(i, j) << " ";
-		}
-		std::cout << std::endl;
-	}
 
 	// Compare computed pseudo-inverse with expected pseudo-inverse
 	EXPECT_TRUE(areMatricesEqual(pseudo_inverse, ex_pseudo_inverse, 1e-5))
