@@ -193,11 +193,11 @@ MulticopterRateControl::Run()
 			if (_input_rc_sub.update(&input_rc)) {
 				uint16_t rc_value = input_rc.values[4];
 				if (rc_value < 1200) {
-					feedforward = Vector3f(0.0f, -0.4f, 0.0f);
+					feedforward = Vector3f(0.0f, -0.1f, 0.0f); // 30deg
 				} else if (rc_value < 1700) {
-					feedforward = Vector3f(0.0f, 0.0f, 0.0f);
+					feedforward = Vector3f(0.0f, -0.2f, 0.0f); // 60deg
 				} else {
-					feedforward = Vector3f(0.0f, 0.0f, 0.0f);
+					feedforward = Vector3f(0.0f, -0.4f, 0.0f); // 90deg
 				}
 			}
 
@@ -232,6 +232,11 @@ MulticopterRateControl::Run()
 
 			// run rate controller
 			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
+			// att_control 값 출력
+			//if (feedforward.norm() > FLT_EPSILON) {
+			//	PX4_INFO("feedforward: [%.4f, %.4f, %.4f]", (double)feedforward(0), (double)feedforward(1), (double)feedforward(2));
+			//	PX4_INFO("att_control: [%.4f, %.4f, %.4f]", (double)att_control(0), (double)att_control(1), (double)att_control(2));
+			//}
 
 			// publish rate controller status
 			rate_ctrl_status_s rate_ctrl_status{};
