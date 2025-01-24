@@ -65,6 +65,9 @@ ControlAllocationPseudoInverse::updatePseudoInverse()
 		}
 
 		normalizeControlAllocationMatrix();
+		for (int i = 0; i < _num_actuators; i++) {
+			PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		}
 		_mix_update_needed = false;
 	}
 }

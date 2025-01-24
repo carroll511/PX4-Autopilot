@@ -186,10 +186,27 @@ MulticopterRateControl::Run()
 		// run the rate controller
 		if (_vehicle_control_mode.flag_control_rates_enabled) {
 
+			// rc_input value should be sended to rate controller
+			Vector3f feedforward{0.0f, 0.0f, 0.0f};
+			input_rc_s input_rc;
+
+			if (_input_rc_sub.update(&input_rc)) {
+				uint16_t rc_value = input_rc.values[4];
+				if (rc_value < 1200) {
+					feedforward = Vector3f(0.0f, -0.4f, 0.0f);
+				} else if (rc_value < 1700) {
+					feedforward = Vector3f(0.0f, 0.0f, 0.0f);
+				} else {
+					feedforward = Vector3f(0.0f, 0.0f, 0.0f);
+				}
+			}
+
 			// reset integral if disarmed
 			if (!_vehicle_control_mode.flag_armed || _vehicle_status.vehicle_type != vehicle_status_s::VEHICLE_TYPE_ROTARY_WING) {
 				_rate_control.resetIntegral();
 			}
+
+			_rate_control.setFeedForward(feedforward);
 
 			// update saturation status from control allocation feedback
 			control_allocator_status_s control_allocator_status;
@@ -214,7 +231,6 @@ MulticopterRateControl::Run()
 			}
 
 			// run rate controller
-			// rc_input value should be sended to rate controller
 			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
 
 			// publish rate controller status

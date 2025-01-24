@@ -40,8 +40,6 @@
 
 using namespace matrix;
 
-matrix::Vector3f gravity_ff{0.0f, -0.4f, 0.0f}; // 중력 보상 ff term
-
 void RateControl::setGains(const Vector3f &P, const Vector3f &I, const Vector3f &D)
 {
 	_gain_p = P;
@@ -70,6 +68,11 @@ void RateControl::setNegativeSaturationFlag(size_t axis, bool is_saturated)
 	}
 }
 
+void RateControl::setFeedForward(const Vector3f &feedforward)
+{
+	_external_feedforward = feedforward;
+}
+
 Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, const Vector3f &angular_accel,
 			     const float dt, const bool landed)
 {
@@ -77,7 +80,7 @@ Vector3f RateControl::update(const Vector3f &rate, const Vector3f &rate_sp, cons
 	Vector3f rate_error = rate_sp - rate;
 
 	// PID control with feed forward
-	const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp) + gravity_ff;
+	const Vector3f torque = _gain_p.emult(rate_error) + _rate_int - _gain_d.emult(angular_accel) + _gain_ff.emult(rate_sp) + _external_feedforward;
 
 	// update integral only if we are not landed
 	if (!landed) {
