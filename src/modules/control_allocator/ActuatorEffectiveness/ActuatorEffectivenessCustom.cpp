@@ -36,7 +36,7 @@
 using namespace matrix;
 
 ActuatorEffectivenessCustom::ActuatorEffectivenessCustom(ModuleParams *parent)
-	: ModuleParams(parent), _motors(this), _torque(this)
+	: ModuleParams(parent), _motors(this)
 {
 }
 
@@ -53,10 +53,10 @@ ActuatorEffectivenessCustom::getEffectivenessMatrix(Configuration &configuration
 	const bool motors_added_successfully = _motors.addActuators(configuration);
 	_motors_mask = _motors.getMotors();
 
-	// Torque
-	const bool torque_added_successfully = _torque.addActuators(configuration);
+	// // Torque
+	// const bool torque_added_successfully = _torque.addActuators(configuration);
 
-	return (motors_added_successfully && torque_added_successfully);
+	return (motors_added_successfully);
 }
 
 void ActuatorEffectivenessCustom::updateSetpoint(const matrix::Vector<float, NUM_AXES> &control_sp,

@@ -222,33 +222,33 @@ ControlAllocator::update_effectiveness_source()
 			tmp = new ActuatorEffectivenessMultirotor(this);
 			break;
 
-		case EffectivenessSource::STANDARD_VTOL:
-			tmp = new ActuatorEffectivenessStandardVTOL(this);
-			break;
+		// case EffectivenessSource::STANDARD_VTOL:
+		// 	tmp = new ActuatorEffectivenessStandardVTOL(this);
+		// 	break;
 
-		case EffectivenessSource::TILTROTOR_VTOL:
-			tmp = new ActuatorEffectivenessTiltrotorVTOL(this);
-			break;
+		// case EffectivenessSource::TILTROTOR_VTOL:
+		// 	tmp = new ActuatorEffectivenessTiltrotorVTOL(this);
+		// 	break;
 
-		case EffectivenessSource::TAILSITTER_VTOL:
-			tmp = new ActuatorEffectivenessTailsitterVTOL(this);
-			break;
+		// case EffectivenessSource::TAILSITTER_VTOL:
+		// 	tmp = new ActuatorEffectivenessTailsitterVTOL(this);
+		// 	break;
 
-		case EffectivenessSource::ROVER_ACKERMANN:
-			tmp = new ActuatorEffectivenessRoverAckermann();
-			break;
+		// case EffectivenessSource::ROVER_ACKERMANN:
+		// 	tmp = new ActuatorEffectivenessRoverAckermann();
+		// 	break;
 
-		case EffectivenessSource::ROVER_DIFFERENTIAL:
-			tmp = new ActuatorEffectivenessRoverDifferential();
-			break;
+		// case EffectivenessSource::ROVER_DIFFERENTIAL:
+		// 	tmp = new ActuatorEffectivenessRoverDifferential();
+		// 	break;
 
-		case EffectivenessSource::FIXED_WING:
-			tmp = new ActuatorEffectivenessFixedWing(this);
-			break;
+		// case EffectivenessSource::FIXED_WING:
+		// 	tmp = new ActuatorEffectivenessFixedWing(this);
+		// 	break;
 
-		case EffectivenessSource::MOTORS_6DOF: // just a different UI from MULTIROTOR
-			tmp = new ActuatorEffectivenessUUV(this);
-			break;
+		// case EffectivenessSource::MOTORS_6DOF: // just a different UI from MULTIROTOR
+		// 	tmp = new ActuatorEffectivenessUUV(this);
+		// 	break;
 
 		case EffectivenessSource::MULTIROTOR_WITH_TILT:
 			tmp = new ActuatorEffectivenessMCTilt(this);
@@ -258,9 +258,9 @@ ControlAllocator::update_effectiveness_source()
 			tmp = new ActuatorEffectivenessCustom(this);
 			break;
 
-		case EffectivenessSource::HELICOPTER:
-			tmp = new ActuatorEffectivenessHelicopter(this);
-			break;
+		// case EffectivenessSource::HELICOPTER:
+		// 	tmp = new ActuatorEffectivenessHelicopter(this);
+		// 	break;
 
 		default:
 			PX4_ERR("Unknown airframe");

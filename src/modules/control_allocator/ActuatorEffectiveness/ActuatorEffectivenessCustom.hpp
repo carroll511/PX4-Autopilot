@@ -35,7 +35,7 @@
 
 #include "ActuatorEffectiveness.hpp"
 #include "ActuatorEffectivenessRotors.hpp"
-#include "ActuatorEffectivenessControlSurfaces.hpp"
+// #include "ActuatorEffectivenessControlSurfaces.hpp"
 
 class ActuatorEffectivenessCustom : public ModuleParams, public ActuatorEffectiveness
 {
@@ -53,7 +53,7 @@ public:
 
 protected:
 	ActuatorEffectivenessRotors _motors;
-	ActuatorEffectivenessControlSurfaces _torque;
+	// ActuatorEffectivenessControlSurfaces _torque;
 
 	uint32_t _motors_mask{};
 };
