@@ -12,3 +12,4 @@ ipch/
 browse.vc.db*
 
 *.log
+settings.json

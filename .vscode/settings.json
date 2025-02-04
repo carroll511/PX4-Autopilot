@@ -127,5 +127,15 @@
         "terminal.integrated.scrollback": 15000,
         "yaml.schemas": {
                 "${workspaceFolder}/validation/module_schema.yaml": "${workspaceFolder}/src/modules/*/module.yaml"
-        }
+        },
+        "python.autoComplete.extraPaths": [
+                "/home/hoon/hybrid/ros2_ws/install/px4_msgs/lib/python3.8/site-packages",
+                "/home/hoon/hybrid/ros2_ws/install/hybrid_control/lib/python3.8/site-packages",
+                "/opt/ros/foxy/lib/python3.8/site-packages"
+        ],
+        "python.analysis.extraPaths": [
+                "/home/hoon/hybrid/ros2_ws/install/px4_msgs/lib/python3.8/site-packages",
+                "/home/hoon/hybrid/ros2_ws/install/hybrid_control/lib/python3.8/site-packages",
+                "/opt/ros/foxy/lib/python3.8/site-packages"
+        ]
 }
