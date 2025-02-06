@@ -43,12 +43,8 @@
 
 #include <ActuatorEffectiveness.hpp>
 #include <ActuatorEffectivenessMultirotor.hpp>
-#include <ActuatorEffectivenessStandardVTOL.hpp>
-#include <ActuatorEffectivenessTiltrotorVTOL.hpp>
-#include <ActuatorEffectivenessTailsitterVTOL.hpp>
 #include <ActuatorEffectivenessRoverAckermann.hpp>
 #include <ActuatorEffectivenessRoverDifferential.hpp>
-#include <ActuatorEffectivenessFixedWing.hpp>
 #include <ActuatorEffectivenessMCTilt.hpp>
 #include <ActuatorEffectivenessCustom.hpp>
 #include <ActuatorEffectivenessUUV.hpp>

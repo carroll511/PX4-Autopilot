@@ -41,6 +41,29 @@
 
 #include "ControlAllocationPseudoInverse.hpp"
 
+const float ControlAllocationPseudoInverse::pseudo_inverse_matrix_30[24] = {
+	-0.24818216f,  0.04478641f, 0.46538751f, -0.06688975f, 0.0f, -0.04822361f,
+	 0.24818216f, -0.04785127f, 0.46538751f,  0.06472719f, 0.0f, -0.04359173f,
+	 0.24818216f,  0.04478641f, 0.46538751f, -0.06688975f, 0.0f, -0.04822361f,
+	-0.24818216f, -0.04785127f, 0.46538751f,  0.06472719f, 0.0f, -0.04359173f
+};
+
+const float ControlAllocationPseudoInverse::pseudo_inverse_matrix_60[24] = {
+	-0.24818216f,  0.0223697f,  0.46538751f, -0.06688975f, 0.0f, -0.04822361f,
+	 0.24818216f, -0.04570233f, 0.46538751f,  0.06472719f, 0.0f, -0.04359173f,
+	 0.24818216f,  0.0223697f,  0.46538751f, -0.06688975f, 0.0f, -0.04822361f,
+	-0.24818216f, -0.04570233f, 0.46538751f,  0.06472719f, 0.0f, -0.04359173f
+};
+
+const float ControlAllocationPseudoInverse::pseudo_inverse_matrix_90[24] = {
+	-0.24818216f,  0.01254174f, 0.46538751f, -0.06688975f, 0.0f, -0.04822361f,
+	 0.24818216f, -0.03856891f, 0.46538751f,  0.06472719f, 0.0f, -0.04359173f,
+	 0.24818216f,  0.01254174f, 0.46538751f, -0.06688975f, 0.0f, -0.04822361f,
+	-0.24818216f, -0.03856891f, 0.46538751f,  0.06472719f, 0.0f, -0.04359173f
+};
+
+float ControlAllocationPseudoInverse::_current_mixer_matrix[24];
+
 void
 ControlAllocationPseudoInverse::setEffectivenessMatrix(
 	const matrix::Matrix<float, ControlAllocation::NUM_AXES, ControlAllocation::NUM_ACTUATORS> &effectiveness,
@@ -56,19 +79,62 @@ ControlAllocationPseudoInverse::setEffectivenessMatrix(
 void
 ControlAllocationPseudoInverse::updatePseudoInverse()
 {
-	if (_mix_update_needed) {
-		matrix::geninv(_effectiveness, _mix);
+	input_rc_s input_rc;
+	const float *selected_mixer = nullptr;
+	// const float *previous_selected_mixer = nullptr;
 
-		if (_normalization_needs_update && !_had_actuator_failure) {
-			updateControlAllocationMatrixScale();
-			_normalization_needs_update = false;
+	if (_mix_update_needed) {
+		if (_input_rc_sub.update(&input_rc)) {
+			uint16_t rc_value = input_rc.values[4];
+
+			if (rc_value < 1200) {
+				selected_mixer = pseudo_inverse_matrix_30;
+			} else if (rc_value < 1700) {
+				selected_mixer = pseudo_inverse_matrix_30;
+			} else {
+				selected_mixer = pseudo_inverse_matrix_30;
+			}
+
+			// if ((input_rc.values[4] != _last_rc_input.values[4]) && (selected_mixer != previous_selected_mixer)) {
+			if (input_rc.values[4] != _last_rc_input.values[4]) {
+				for (int i = 0; i < 4; i++) {
+					for (int j = 0; j < 6; j++) {
+						_mix(i, j) = selected_mixer[i * 6 + j];
+					}
+				}
+			}
+			// previous_selected_mixer = selected_mixer;
 		}
 
+		PX4_INFO("Before normalization:");
+		for (int i = 0; i < _num_actuators; i++) {
+			PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		}
+
+		updateControlAllocationMatrixScale();
+		_normalization_needs_update = false;
+
 		normalizeControlAllocationMatrix();
-		//for (int i = 0; i < _num_actuators; i++) {
-		//	PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
-		//}
 		_mix_update_needed = false;
+
+		PX4_INFO("After normalization:");
+		for (int i = 0; i < _num_actuators; i++) {
+			PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		}
+
+
+		// matrix::geninv(_effectiveness, _mix);
+
+		// if (_normalization_needs_update && !_had_actuator_failure) {
+		// 	updateControlAllocationMatrixScale();
+		// 	_normalization_needs_update = false;
+		// }
+
+		// normalizeControlAllocationMatrix();
+		// for (int i = 0; i < _num_actuators; i++) {
+		// 	PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		// }
+		// _mix_update_needed = false;
 	}
 }
 
@@ -127,6 +193,7 @@ ControlAllocationPseudoInverse::updateControlAllocationMatrixScale()
 		for (int i = 0; i < _num_actuators; i++) {
 			float norm = fabsf(_mix(i, 3 + axis_idx));
 			norm_sum += norm;
+			PX4_INFO("[%d] %f", i, (double)norm);
 
 			if (norm > FLT_EPSILON) {
 				++num_non_zero_thrust;
@@ -179,6 +246,41 @@ ControlAllocationPseudoInverse::allocate()
 
 	_prev_actuator_sp = _actuator_sp;
 
+	// PX4_INFO("Control Setpoints (_control_sp):");
+	// for (int i = 0; i < NUM_AXES; i++) {
+	// 	PX4_INFO("[%d] %f", i, (double)_control_sp(i));
+	// }
+
+	// PX4_INFO("Control Trims (_control_trim):");
+	// for (int i = 0; i < NUM_AXES; i++) {
+	// 	PX4_INFO("[%d] %f", i, (double)_control_trim(i));
+	// }
+
+	// PX4_INFO("Mixing Matrix (_mix):");
+	// for (int i = 0; i < NUM_ACTUATORS; i++) {
+	// 	for (int j = 0; j < NUM_AXES; j++) {
+	// 		PX4_INFO("mix[%d][%d]: %f", i, j, (double)_mix(i, j));
+	// 	}
+	// }
+
+	// PX4_INFO("Control allocation scale (_control_allocation_scale)");
+	// // matrix::Vector<float, NUM_AXES> _control_allocation_scale;
+	// for (int i = 0; i < NUM_AXES; i++) {
+	// 	PX4_INFO("%f", (double)_control_allocation_scale(i));
+	// }
+
 	// Allocate
 	_actuator_sp = _actuator_trim + _mix * (_control_sp - _control_trim);
+	// control_trim def: _control_trim = _effectiveness * linearization_point_clipped;
+
+	// PX4_INFO("Actuator Trim (_actuator_trim):");
+	// for (int i = 0; i < NUM_ACTUATORS; i++) {
+	// 	PX4_INFO("[%d] %f", i, (double)_actuator_trim(i));
+	// }
+
+	// PX4_INFO("Actuator Setpoints (_actuator_sp):");
+	// for (int i = 0; i < _num_actuators; i++) {
+	// 	PX4_INFO("[%d] %f", i, (double)_actuator_sp(i));
+	// }
+
 }

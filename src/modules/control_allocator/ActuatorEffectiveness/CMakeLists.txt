@@ -40,8 +40,6 @@ px4_add_library(ActuatorEffectiveness
 	ActuatorEffectivenessControlSurfaces.hpp
 	ActuatorEffectivenessCustom.cpp
 	ActuatorEffectivenessCustom.hpp
-	ActuatorEffectivenessFixedWing.cpp
-	ActuatorEffectivenessFixedWing.hpp
 	ActuatorEffectivenessHelicopter.cpp
 	ActuatorEffectivenessHelicopter.hpp
 	ActuatorEffectivenessMCTilt.cpp
@@ -52,12 +50,6 @@ px4_add_library(ActuatorEffectiveness
 	ActuatorEffectivenessTilts.hpp
 	ActuatorEffectivenessRotors.cpp
 	ActuatorEffectivenessRotors.hpp
-	ActuatorEffectivenessStandardVTOL.cpp
-	ActuatorEffectivenessStandardVTOL.hpp
-	ActuatorEffectivenessTiltrotorVTOL.cpp
-	ActuatorEffectivenessTiltrotorVTOL.hpp
-	ActuatorEffectivenessTailsitterVTOL.cpp
-	ActuatorEffectivenessTailsitterVTOL.hpp
 	ActuatorEffectivenessRoverAckermann.hpp
 	ActuatorEffectivenessRoverAckermann.cpp
 	ActuatorEffectivenessRoverDifferential.hpp

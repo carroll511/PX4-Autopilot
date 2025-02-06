@@ -193,11 +193,11 @@ MulticopterRateControl::Run()
 			if (_input_rc_sub.update(&input_rc)) {
 				uint16_t rc_value = input_rc.values[4];
 				if (rc_value < 1200) {
-					feedforward = Vector3f(0.0f, -0.1f, 0.0f); // 30deg
+					feedforward = Vector3f(0.0f, 0.0f, 0.0f); // 30deg
 				} else if (rc_value < 1700) {
-					feedforward = Vector3f(0.0f, -0.2f, 0.0f); // 60deg
+					feedforward = Vector3f(0.0f, 0.0f, 0.0f); // 60deg
 				} else {
-					feedforward = Vector3f(0.0f, -0.4f, 0.0f); // 90deg
+					feedforward = Vector3f(0.0f, 0.0f, 0.0f); // 90deg
 				}
 			}
 

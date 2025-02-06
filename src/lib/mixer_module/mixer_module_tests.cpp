@@ -54,8 +54,8 @@ static constexpr int max_num_outputs = 8;
 
 static constexpr int disarmed_value = 900;
 static constexpr int failsafe_value = 800;
-static constexpr int min_value = 1000;
-static constexpr int max_value = 2000;
+static constexpr int min_value = 1130;
+static constexpr int max_value = 1900;
 
 class MixerModuleTest : public ::testing::Test
 {
@@ -464,4 +464,75 @@ TEST_F(MixerModuleTest, prearm)
 	test_module.reset();
 
 	EXPECT_FALSE(test_module.was_scheduled);
+}
+
+TEST_F(MixerModuleTest, torqueThrustMotorOutputs)
+{
+	OutputModuleTest test_module;
+	test_module.configureFunctions({
+		(int)OutputFunction::Motor1,
+		(int)OutputFunction::Motor2,
+		(int)OutputFunction::Motor3,
+		(int)OutputFunction::Motor4,});
+
+	MixingOutput mixing_output{PARAM_PREFIX, max_num_outputs, test_module, MixingOutput::SchedulingPolicy::Disabled, false, false};
+	mixing_output.setAllDisarmedValues(disarmed_value);
+	mixing_output.setAllFailsafeValues(failsafe_value);
+	mixing_output.setAllMinValues(min_value);
+	mixing_output.setAllMaxValues(max_value);
+
+	std::array<float, actuator_motors_s::NUM_CONTROLS> torque_thrust_setpoint = {
+		-0.3195,
+		-0.3776,
+		0.0182,
+		0,
+		0,
+		-0.28
+	};
+
+	static constexpr float mixer_matrix[4][6] = {
+		{-0.24818216,  0.04587143,  0.46538751, -0.06291316,  0, -0.04873658},
+		{ 0.24818216, -0.04930917,  0.46538751,  0.06291316,  0, -0.04302574},
+		{ 0.24818216,  0.04587143, -0.46538751, -0.06291316,  0, -0.04873658},
+		{-0.24818216, -0.04930917, -0.46538751,  0.06291316,  0, -0.04302574}
+	};
+
+	// ✅ 3. Mixer 적용하여 모터 출력 계산 (4개 모터)
+	std::array<float, 4> motor_outputs = {0.0f, 0.0f, 0.0f, 0.0f};
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 6; ++j) {
+		motor_outputs[i] += mixer_matrix[i][j] * torque_thrust_setpoint[j];
+		}
+	}
+
+	// ✅ 4. sendMotors()가 std::array<float, 12>를 요구하므로, 크기를 맞춰야 함.
+	std::array<float, actuator_motors_s::NUM_CONTROLS> full_motor_outputs{};
+	for (size_t i = 0; i < motor_outputs.size(); ++i) {
+		full_motor_outputs[i] = motor_outputs[i];
+	}
+
+	// ✅ 5. Mixer에 입력값 전달
+	test_module.sendMotors(full_motor_outputs);
+
+	// ✅ 6. Mixer 업데이트
+	mixing_output.updateSubscriptions(false);
+	EXPECT_EQ(test_module.num_updates, update(mixing_output));
+
+	// ✅ 7. PWM 값 변환
+	std::array<uint16_t, max_num_outputs> expected_outputs;
+	for (int i = 0; i < 4; ++i) {
+		expected_outputs[i] = (motor_outputs[i] * (max_value - min_value)) + min_value;
+
+		// 수동으로 최소/최대 범위를 제한
+		if (expected_outputs[i] < min_value) expected_outputs[i] = min_value;
+		if (expected_outputs[i] > max_value) expected_outputs[i] = max_value;
+
+	}
+
+	// ✅ 8. 출력값 검증
+	for (int i = 0; i < 4; ++i) {
+		EXPECT_NEAR(test_module.outputs[i], expected_outputs[i], 30); // 오차 범위 30 허용
+	}
+
+	test_module.reset();
 }

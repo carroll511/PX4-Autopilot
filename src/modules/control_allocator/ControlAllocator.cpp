@@ -252,28 +252,12 @@ ControlAllocator::update_effectiveness_source()
 			tmp = new ActuatorEffectivenessMultirotor(this);
 			break;
 
-		case EffectivenessSource::STANDARD_VTOL:
-			tmp = new ActuatorEffectivenessStandardVTOL(this);
-			break;
-
-		case EffectivenessSource::TILTROTOR_VTOL:
-			tmp = new ActuatorEffectivenessTiltrotorVTOL(this);
-			break;
-
-		case EffectivenessSource::TAILSITTER_VTOL:
-			tmp = new ActuatorEffectivenessTailsitterVTOL(this);
-			break;
-
 		case EffectivenessSource::ROVER_ACKERMANN:
 			tmp = new ActuatorEffectivenessRoverAckermann();
 			break;
 
 		case EffectivenessSource::ROVER_DIFFERENTIAL:
 			tmp = new ActuatorEffectivenessRoverDifferential();
-			break;
-
-		case EffectivenessSource::FIXED_WING:
-			tmp = new ActuatorEffectivenessFixedWing(this);
 			break;
 
 		case EffectivenessSource::MOTORS_6DOF: // just a different UI from MULTIROTOR
@@ -414,12 +398,18 @@ ControlAllocator::Run()
 		}
 	}
 
+	// PX4_INFO("Torque SP: [%.2f, %.2f, %.2f]",
+	// 	(double)_torque_sp(0), (double)_torque_sp(1), (double)_torque_sp(2));
+	// PX4_INFO("Thrust SP: [%.2f, %.2f, %.2f]",
+	// 	(double)_thrust_sp(0), (double)_thrust_sp(1), (double)_thrust_sp(2));
+
+
 	// ---------------------
 	// RC input update check
 	// ---------------------
 	input_rc_s input_rc;
 
-	static float const *previous_selected_values = nullptr;
+	// static float const *previous_selected_values = nullptr;
 	float const *selected_values = nullptr;
 
 	if (_input_rc_sub.update(&input_rc)) {
@@ -429,12 +419,13 @@ ControlAllocator::Run()
 		if (rc_value < 1200) {
 			selected_values = values_30;
 		} else if (rc_value < 1700) {
-			selected_values = values_60;
+			selected_values = values_30;
 		} else {
-			selected_values = values_90;
+			selected_values = values_30;
 		}
 
-		if ((input_rc.values[4] != _last_rc_input.values[4]) && (selected_values != previous_selected_values)) {
+		// if ((input_rc.values[4] != _last_rc_input.values[4]) && (selected_values != previous_selected_values)) {
+		if (input_rc.values[4] != _last_rc_input.values[4]) {
 			//PX4_INFO("RC input changed: Updating rotor positions. Value changed from %u to %u",
              		//	_last_rc_input.values[4], input_rc.values[4]);
 
@@ -455,6 +446,8 @@ ControlAllocator::Run()
 							// (e.g. a user could add/remove motors, such that the bitmask isn't correct anymore)
 							updateParams();
 							parameters_updated();
+						} else {
+							PX4_ERR("motor bitmask != 0");
 						}
 					} else {
 						PX4_ERR("Failed to update parameter %s", param_names[i]);
@@ -463,7 +456,7 @@ ControlAllocator::Run()
 					PX4_ERR("Parameter %s not found", param_names[i]);
 				}
 			}
-			previous_selected_values = selected_values;
+			// previous_selected_values = selected_values;
 			do_update = true;
 		}
 		_last_rc_input = input_rc;
@@ -477,9 +470,17 @@ ControlAllocator::Run()
 		check_for_motor_failures();
 
 		// update rotor position based on RC input
-		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::CONFIGURATION_UPDATE);
+		// update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::CONFIGURATION_UPDATE);
 
-		//update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
+		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
+		// const matrix::Matrix<float, NUM_AXES, NUM_ACTUATORS> &effectiveness_matrix =
+		// 	_control_allocation[0]->getEffectivenessMatrix();
+
+		// for (int row = 0; row < NUM_AXES; row++) {
+		// 	for (int col = 0; col < NUM_ACTUATORS; col++) {
+		// 		PX4_INFO("Effectiveness[%d][%d]: %.4f", row, col, (double)effectiveness_matrix(row, col));
+		// 	}
+		// }
 
 		// Set control setpoint vector(s)
 		matrix::Vector<float, NUM_AXES> c[ActuatorEffectiveness::MAX_NUM_MATRICES];
@@ -521,6 +522,16 @@ ControlAllocator::Run()
 			_control_allocation[i]->clipActuatorSetpoint();
 		}
 	}
+
+	// actuator_motors_s actuator_motors;
+	// if (_actuator_motors_sub.update(&actuator_motors)) {
+	// 	PX4_INFO("Actuator Motor Outputs:");
+	// 	for (int i = 0; i < actuator_motors_s::NUM_CONTROLS; i++) {
+	// 		PX4_INFO("Motor[%d]: %.4f", i, (double)actuator_motors.control[i]);
+	// 	}
+	// } else {
+	// 	PX4_ERR("Failed to update actuator motor outputs.");
+	// }
 
 	// Publish actuator setpoint and allocator status
 	publish_actuator_controls();
@@ -723,6 +734,23 @@ ControlAllocator::publish_control_allocator_status(int matrix_index)
 	control_allocator_status.handled_motor_failure_mask = _handled_motor_failure_bitmask;
 
 	_control_allocator_status_pub[matrix_index].publish(control_allocator_status);
+
+	// ///// actuator_sp
+	// PX4_INFO("Actuator Setpoints (actuator_sp):");
+	// for (int i = 0; i < NUM_ACTUATORS; i++) {
+	// 	PX4_INFO("[%d] %f", i, (double)actuator_sp(i));
+	// }
+
+	// //// effectiveness
+	// PX4_INFO("Effectiveness (Effectiveness):");
+	// const matrix::Matrix<float, NUM_AXES, NUM_ACTUATORS> &effectiveness_matrix =
+	// 		_control_allocation[0]->getEffectivenessMatrix();
+
+	// 	for (int row = 0; row < NUM_AXES; row++) {
+	// 		for (int col = 0; col < NUM_ACTUATORS; col++) {
+	// 			PX4_INFO("Effectiveness[%d][%d]: %.4f", row, col, (double)effectiveness_matrix(row, col));
+	// 		}
+	// 	}
 }
 
 void

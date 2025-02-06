@@ -147,18 +147,18 @@ TEST(ControlAllocationTest, PseudoInverseAndNormalization)
 	constexpr size_t num_actuators = 4;
 
 	matrix::Matrix<float, num_controls, num_actuators> effectiveness;
-	effectiveness(0, 0) = -1.0073246f; effectiveness(0, 1) = 1.0073246f; effectiveness(0, 2) = 1.0073246f;  effectiveness(0, 3) = -1.0073246f;
-	effectiveness(1, 0) = 1.6425133f;  effectiveness(1, 1) = -2.29491f;  effectiveness(1, 2) = 1.6425133f;  effectiveness(1, 3) = -2.29491f;
+	effectiveness(0, 0) = -1.007325f; effectiveness(0, 1) = 1.007325f; effectiveness(0, 2) = 1.007325f;  effectiveness(0, 3) = -1.007325f;
+	effectiveness(1, 0) = 1.519199f;  effectiveness(1, 1) = -2.062862f;  effectiveness(1, 2) = 1.519199f;  effectiveness(1, 3) = -2.062862f;
 	effectiveness(2, 0) = 0.53718674;  effectiveness(2, 1) = 0.53718674; effectiveness(2, 2) = -0.53718674; effectiveness(2, 3) = -0.53718674;
 	effectiveness(3, 0) = -2.5382986;  effectiveness(3, 1) = 2.5382986;  effectiveness(3, 2) = -2.5382986;  effectiveness(3, 3) = 2.5382986;
 	effectiveness(4, 0) = 0.0f;        effectiveness(4, 1) = 0.0f;       effectiveness(4, 2) = 0.0f;        effectiveness(4, 3) = 0.0f;
 	effectiveness(5, 0) = -5.4366393;  effectiveness(5, 1) = -5.4366393; effectiveness(5, 2) = -5.4366393;  effectiveness(5, 3) = -5.4366393;
 
 	matrix::Matrix<float, num_actuators, num_controls> ex_pseudo_inverse;
-	ex_pseudo_inverse(0, 0) = -0.24818216f; ex_pseudo_inverse(0, 1) = 0.04587143f;  ex_pseudo_inverse(0, 2) = 0.46538751f;  ex_pseudo_inverse(0, 3) = -0.06291316f; ex_pseudo_inverse(0, 4) = 0.0f; ex_pseudo_inverse(0, 5) = -0.04873658f;
-	ex_pseudo_inverse(1, 0) = 0.24818216f;  ex_pseudo_inverse(1, 1) = -0.04930917f; ex_pseudo_inverse(1, 2) = 0.46538751f;  ex_pseudo_inverse(1, 3) = 0.06024684f;  ex_pseudo_inverse(1, 4) = 0.0f; ex_pseudo_inverse(1, 5) = -0.04302574;
-	ex_pseudo_inverse(2, 0) = 0.24818216f;  ex_pseudo_inverse(2, 1) = 0.04587143f;  ex_pseudo_inverse(2, 2) = -0.46538751f; ex_pseudo_inverse(2, 3) = -0.06291316f; ex_pseudo_inverse(2, 4) = 0.0f; ex_pseudo_inverse(2, 5) = -0.04873658f;
-	ex_pseudo_inverse(3, 0) = -0.24818216f; ex_pseudo_inverse(3, 1) = -0.04930917f; ex_pseudo_inverse(3, 2) = -0.46538751f; ex_pseudo_inverse(3, 3) = 0.06024684f;  ex_pseudo_inverse(3, 4) = 0.0f; ex_pseudo_inverse(3, 5) = -0.04302574;
+	ex_pseudo_inverse(0, 0) = -0.24818207f; ex_pseudo_inverse(0, 1) = 0.04478641f;  ex_pseudo_inverse(0, 2) = 0.46538815f;  ex_pseudo_inverse(0, 3) = -0.06688975f; ex_pseudo_inverse(0, 4) = 0.0f; ex_pseudo_inverse(0, 5) = -0.04822361f;
+	ex_pseudo_inverse(1, 0) = 0.24818207f;  ex_pseudo_inverse(1, 1) = -0.04785125f; ex_pseudo_inverse(1, 2) = 0.46538815f;  ex_pseudo_inverse(1, 3) = 0.06472718f;  ex_pseudo_inverse(1, 4) = 0.0f; ex_pseudo_inverse(1, 5) = -0.04359173f;
+	ex_pseudo_inverse(2, 0) = 0.24818207f;  ex_pseudo_inverse(2, 1) = 0.04478641f;  ex_pseudo_inverse(2, 2) = -0.46538815f; ex_pseudo_inverse(2, 3) = -0.06688975f; ex_pseudo_inverse(2, 4) = 0.0f; ex_pseudo_inverse(2, 5) = -0.04822361f;
+	ex_pseudo_inverse(3, 0) = -0.24818207f; ex_pseudo_inverse(3, 1) = -0.04785125f; ex_pseudo_inverse(3, 2) = -0.46538815f; ex_pseudo_inverse(3, 3) = 0.06472718f;  ex_pseudo_inverse(3, 4) = 0.0f; ex_pseudo_inverse(3, 5) = -0.04359173f;
 
 	// Step 1: Validation of pseudo-inverse computation
 	matrix::Matrix<float, num_actuators, num_controls> pseudo_inverse;

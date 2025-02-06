@@ -48,6 +48,9 @@
 #include "ControlAllocation.hpp"
 #include <px4_platform_common/log.h>
 
+#include <uORB/Subscription.hpp>
+#include <uORB/topics/input_rc.h>
+
 class ControlAllocationPseudoInverse: public ControlAllocation
 {
 public:
@@ -74,4 +77,13 @@ private:
 	void normalizeControlAllocationMatrix();
 	void updateControlAllocationMatrixScale();
 	bool _normalization_needs_update{false};
+
+	uORB::Subscription _input_rc_sub{ORB_ID(input_rc)};
+	input_rc_s _last_rc_input;
+
+	static const float pseudo_inverse_matrix_30[24];
+	static const float pseudo_inverse_matrix_60[24];
+	static const float pseudo_inverse_matrix_90[24];
+
+	static float _current_mixer_matrix[24];
 };
