@@ -154,15 +154,34 @@ TEST(ControlAllocationTest, PseudoInverseAndNormalization)
 	effectiveness(4, 0) = 0.0f;        effectiveness(4, 1) = 0.0f;       effectiveness(4, 2) = 0.0f;        effectiveness(4, 3) = 0.0f;
 	effectiveness(5, 0) = -5.4366393;  effectiveness(5, 1) = -5.4366393; effectiveness(5, 2) = -5.4366393;  effectiveness(5, 3) = -5.4366393;
 
+	matrix::Matrix<float, 4, 4> effectiveness_no_xy;
+	effectiveness_no_xy(0, 0) = -1.0073246f; effectiveness_no_xy(0, 1) = 1.0073246f; effectiveness_no_xy(0, 2) = 1.0073246f;  effectiveness_no_xy(0, 3) = -1.0073246f;
+	effectiveness_no_xy(1, 0) = 1.6425133f;  effectiveness_no_xy(1, 1) = -2.29491f;  effectiveness_no_xy(1, 2) = 1.6425133f;  effectiveness_no_xy(1, 3) = -2.29491f;
+	effectiveness_no_xy(2, 0) = 0.53718674;  effectiveness_no_xy(2, 1) = 0.53718674; effectiveness_no_xy(2, 2) = -0.53718674; effectiveness_no_xy(2, 3) = -0.53718674;
+	effectiveness_no_xy(3, 0) = -5.4366393;  effectiveness_no_xy(3, 1) = -5.4366393; effectiveness_no_xy(3, 2) = -5.4366393;  effectiveness_no_xy(3, 3) = -5.4366393;
+
 	matrix::Matrix<float, num_actuators, num_controls> ex_pseudo_inverse;
 	ex_pseudo_inverse(0, 0) = -0.24818216f; ex_pseudo_inverse(0, 1) = 0.04587143f;  ex_pseudo_inverse(0, 2) = 0.46538751f;  ex_pseudo_inverse(0, 3) = -0.06291316f; ex_pseudo_inverse(0, 4) = 0.0f; ex_pseudo_inverse(0, 5) = -0.04873658f;
 	ex_pseudo_inverse(1, 0) = 0.24818216f;  ex_pseudo_inverse(1, 1) = -0.04930917f; ex_pseudo_inverse(1, 2) = 0.46538751f;  ex_pseudo_inverse(1, 3) = 0.06024684f;  ex_pseudo_inverse(1, 4) = 0.0f; ex_pseudo_inverse(1, 5) = -0.04302574;
 	ex_pseudo_inverse(2, 0) = 0.24818216f;  ex_pseudo_inverse(2, 1) = 0.04587143f;  ex_pseudo_inverse(2, 2) = -0.46538751f; ex_pseudo_inverse(2, 3) = -0.06291316f; ex_pseudo_inverse(2, 4) = 0.0f; ex_pseudo_inverse(2, 5) = -0.04873658f;
 	ex_pseudo_inverse(3, 0) = -0.24818216f; ex_pseudo_inverse(3, 1) = -0.04930917f; ex_pseudo_inverse(3, 2) = -0.46538751f; ex_pseudo_inverse(3, 3) = 0.06024684f;  ex_pseudo_inverse(3, 4) = 0.0f; ex_pseudo_inverse(3, 5) = -0.04302574;
 
-	// Step 1: Validation of pseudo-inverse computation
+	matrix::Matrix<float, 4, 4> pseudo_inverse_no_xy;
+	geninv(effectiveness_no_xy, pseudo_inverse_no_xy);
+
 	matrix::Matrix<float, num_actuators, num_controls> pseudo_inverse;
 	bool success = geninv(effectiveness, pseudo_inverse);
+
+	matrix::Vector<float, 6> control_sp_61;
+	control_sp_61(0) = 0.0f; control_sp_61(1) = -1.0f; control_sp_61(2) = 0.0f; control_sp_61(3) = 0.0f; control_sp_61(4) = 0.0f; control_sp_61(5) = -0.5f;
+
+	matrix::Vector<float, 4> control_sp_41;
+	control_sp_41(0) = 0.0f; control_sp_41(1) = -1.0f; control_sp_41(2) = 0.0f; control_sp_41(3) = -0.5f;
+
+	std::cout << "actuator setpoint: " << pseudo_inverse * control_sp_61 << std::endl;
+	std::cout << "actuator setpoint_no_xy: " << pseudo_inverse_no_xy * control_sp_41 << std::endl;
+
+	// Step 1: Validation of pseudo-inverse computation
 
 	ASSERT_TRUE(success) << "Psuedo-inverse computation failed";
 
