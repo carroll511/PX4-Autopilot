@@ -218,16 +218,17 @@ ActuatorEffectivenessRotors::computeEffectivenessMatrix(const Geometry &geometry
 			effectiveness(2, i + actuator_start_index) = 0.f;
 		}
 
-		if (geometry.three_dimensional_thrust_disabled) {
+		// if (geometry.three_dimensional_thrust_disabled) {
+		// if (1) {
 			// Special case tiltrotor: instead of passing a 3D thrust vector (that would mostly have a x-component in FW, and z in MC),
 			// pass the vector magnitude as z-component, plus the collective tilt. Passing 3D thrust plus tilt is not feasible as they
 			// can't be allocated independently, and with the current controller it's not possible to have collective tilt calculated
 			// by the allocator directly.
 
-			effectiveness(0 + 3, i + actuator_start_index) = 0.f;
-			effectiveness(1 + 3, i + actuator_start_index) = 0.f;
-			effectiveness(2 + 3, i + actuator_start_index) = -ct;
-		}
+		effectiveness(0 + 3, i + actuator_start_index) = 0.f;
+		effectiveness(1 + 3, i + actuator_start_index) = 0.f;
+		effectiveness(2 + 3, i + actuator_start_index) = -ct;
+		// }
 	}
 
 	return num_actuators;
@@ -316,23 +317,3 @@ ActuatorEffectivenessRotors::getEffectivenessMatrix(Configuration &configuration
 
 	return addActuators(configuration);
 }
-
-//void
-//ActuatorEffectivenessRotors::updateRotorPositions(const float *positions, int num_rotors)
-//{
-//	for (int i = 0; i < 12; i++) {
-//		param_t param_handle = param_find(param_names[i]);
-//
-//		if (param_handle != PARAM_INVALID) {
-//			int result = param_set(param_handle, &positions[i]);
-//
-//			if (result == PX4_OK) {
-//				PX4_INFO("Parameter %s updated to %.2f", param_names[i], double(positions[i]));
-//			} else {
-//				PX4_WARN("Failed to update parameter %s", param_names[i]);
-//			}
-//		} else {
-//			PX4_WARN("Parameter %s not found", param_names[i]);
-//		}
-//	}
-//}

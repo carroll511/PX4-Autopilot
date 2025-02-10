@@ -10,8 +10,6 @@
 #pragma once
 
 #include "math.hpp"
-#undef PX4_DEBUG
-#define PX4_DEBUG PX4_INFO
 
 namespace matrix
 {
@@ -25,7 +23,6 @@ namespace matrix
 template<typename Type, size_t M, size_t N>
 bool geninv(const Matrix<Type, M, N> &G, Matrix<Type, N, M> &res)
 {
-	PX4_DEBUG("hi");
 	size_t rank;
 
 	if (M <= N) {
@@ -58,7 +55,7 @@ bool geninv(const Matrix<Type, M, N> &G, Matrix<Type, N, M> &res)
 
 		// doing an intermediate assignment reduces stack usage
 		A = X * X * L.transpose();
-		res = (L * A) * G.transpose();
+		res = ((L * A) * G.transpose()).eval();
 	}
 
 	return true;

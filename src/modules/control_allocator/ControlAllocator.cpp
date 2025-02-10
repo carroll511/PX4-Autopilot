@@ -470,9 +470,9 @@ ControlAllocator::Run()
 		check_for_motor_failures();
 
 		// update rotor position based on RC input
-		// update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::CONFIGURATION_UPDATE);
+		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::CONFIGURATION_UPDATE);
 
-		update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
+		// update_effectiveness_matrix_if_needed(EffectivenessUpdateReason::NO_EXTERNAL_UPDATE);
 		// const matrix::Matrix<float, NUM_AXES, NUM_ACTUATORS> &effectiveness_matrix =
 		// 	_control_allocation[0]->getEffectivenessMatrix();
 
