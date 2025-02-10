@@ -106,10 +106,10 @@ ControlAllocationPseudoInverse::updatePseudoInverse()
 		// 	// previous_selected_mixer = selected_mixer;
 		// }
 
-		// PX4_INFO("Before normalization:");
-		// for (int i = 0; i < _num_actuators; i++) {
-		// 	PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
-		// }
+		// // PX4_INFO("Before normalization:");
+		// // for (int i = 0; i < _num_actuators; i++) {
+		// // 	PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		// // }
 
 		// updateControlAllocationMatrixScale();
 		// _normalization_needs_update = false;
@@ -135,10 +135,10 @@ ControlAllocationPseudoInverse::updatePseudoInverse()
 
 		matrix::geninv(_effectiveness, _mix);
 
-		// PX4_INFO("Before normalization:");
-		// for (int i = 0; i < _num_actuators; i++) {
-		// 	PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
-		// }
+		PX4_INFO("Before normalization:");
+		for (int i = 0; i < _num_actuators; i++) {
+			PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		}
 
 		if (_normalization_needs_update && !_had_actuator_failure) {
 			updateControlAllocationMatrixScale();
@@ -146,10 +146,10 @@ ControlAllocationPseudoInverse::updatePseudoInverse()
 		}
 
 		normalizeControlAllocationMatrix();
-		// PX4_INFO("After normalization:");
-		// for (int i = 0; i < _num_actuators; i++) {
-		// 	PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
-		// }
+		PX4_INFO("After normalization:");
+		for (int i = 0; i < _num_actuators; i++) {
+			PX4_INFO("%f %f %f %f %f %f", (double)_mix(i, 0), (double)_mix(i, 1), (double)_mix(i, 2), (double)_mix(i, 3), (double)_mix(i, 4), (double)_mix(i, 5));
+		}
 		_mix_update_needed = false;
 	}
 }

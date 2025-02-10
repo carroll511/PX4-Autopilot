@@ -55,7 +55,12 @@ bool geninv(const Matrix<Type, M, N> &G, Matrix<Type, N, M> &res)
 
 		// doing an intermediate assignment reduces stack usage
 		A = X * X * L.transpose();
-		res = ((L * A) * G.transpose()).eval();
+
+		// Instead of eval()
+		auto temp_1 = L * A;
+		auto temp_2 = temp_1 * G.transpose();
+		res = temp_2;
+		// res = ((L * A) * G.transpose()).eval();
 	}
 
 	return true;
@@ -81,7 +86,13 @@ SquareMatrix<Type, N> fullRankCholesky(const SquareMatrix<Type, N> &A,
 	// Loses one ulp accuracy per row of diag, relative to largest magnitude
 	const Type tol = N * typeEpsilon<Type>() * A.diag().max();
 
+	// Initialize L to zero matrix
 	Matrix<Type, N, N> L;
+	for (size_t i = 0; i < N; i++) {
+		for (size_t j = 0; j < N; j++) {
+			L(i, j) = 0;
+		}
+	}
 
 	size_t r = 0;
 
@@ -120,7 +131,6 @@ SquareMatrix<Type, N> fullRankCholesky(const SquareMatrix<Type, N> &A,
 
 	// Return rank
 	rank = r;
-
 	return L;
 }
 
