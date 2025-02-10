@@ -39,6 +39,10 @@ bool geninv(const Matrix<Type, M, N> &G, Matrix<Type, N, M> &res)
 
 		// doing an intermediate assignment reduces stack usage
 		A = X * X * L.transpose();
+
+		auto temp_1 = L * A;
+		auto temp_2 = G.transpose() * temp_1;
+		res = temp_2;
 		res = G.transpose() * (L * A);
 
 	} else {
