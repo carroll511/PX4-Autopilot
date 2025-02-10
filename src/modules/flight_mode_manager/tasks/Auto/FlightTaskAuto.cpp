@@ -220,7 +220,7 @@ void FlightTaskAuto::overrideCruiseSpeed(const float cruise_speed_m_s)
 void FlightTaskAuto::rcHelpModifyYaw(float &yaw_sp)
 {
 	// Only set a yawrate setpoint if weather vane is not active or the yaw stick is out of its dead-zone
-	if (!_weathervane.isActive() || fabsf(_sticks.getYawExpo()) > FLT_EPSILON) {
+	if (fabsf(_sticks.getYawExpo()) > FLT_EPSILON) {
 		_stick_yaw.generateYawSetpoint(_yawspeed_setpoint, yaw_sp, _sticks.getYawExpo(), _yaw, _is_yaw_good_for_control,
 					       _deltatime);
 
@@ -467,7 +467,7 @@ bool FlightTaskAuto::_evaluateTriplets()
 	}
 
 	// activation/deactivation of weather vane is based on parameter WV_EN and setting of navigator (allow_weather_vane)
-	_weathervane.setNavigatorForceDisabled(_sub_triplet_setpoint.get().current.disable_weather_vane);
+	// _weathervane.setNavigatorForceDisabled(_sub_triplet_setpoint.get().current.disable_weather_vane);
 
 	// Calculate the current vehicle state and check if it has updated.
 	State previous_state = _current_state;
@@ -483,26 +483,26 @@ bool FlightTaskAuto::_evaluateTriplets()
 				_triplet_next_wp,
 				_sub_triplet_setpoint.get().next.yaw,
 				_sub_triplet_setpoint.get().next.yawspeed_valid ? _sub_triplet_setpoint.get().next.yawspeed : (float)NAN,
-				_weathervane.isActive(), _sub_triplet_setpoint.get().current.type);
+				false, _sub_triplet_setpoint.get().current.type);
 		_obstacle_avoidance.checkAvoidanceProgress(
 			_position, _triplet_prev_wp, _target_acceptance_radius, Vector2f(_closest_pt));
 	}
 
 	// set heading
-	_weathervane.update();
+	// _weathervane.update();
 
-	if (_weathervane.isActive()) {
+	if (false) {
 		_yaw_setpoint = NAN;
 		// use the yawrate setpoint from WV only if not moving lateral (velocity setpoint below half of _param_mpc_xy_cruise)
 		// otherwise, keep heading constant (as output from WV is not according to wind in this case)
-		bool vehicle_is_moving_lateral = _velocity_setpoint.xy().longerThan(_param_mpc_xy_cruise.get() / 2.0f);
+		// bool vehicle_is_moving_lateral = _velocity_setpoint.xy().longerThan(_param_mpc_xy_cruise.get() / 2.0f);
 
-		if (vehicle_is_moving_lateral) {
-			_yawspeed_setpoint = 0.0f;
+		// if (vehicle_is_moving_lateral) {
+		// 	_yawspeed_setpoint = 0.0f;
 
-		} else {
-			_yawspeed_setpoint = _weathervane.getWeathervaneYawrate();
-		}
+		// } else {
+		// 	_yawspeed_setpoint = _weathervane.getWeathervaneYawrate();
+		// }
 
 	} else {
 		if (!_is_yaw_good_for_control) {

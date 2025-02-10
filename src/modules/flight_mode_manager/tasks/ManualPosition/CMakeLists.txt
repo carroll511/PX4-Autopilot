@@ -39,7 +39,7 @@ px4_add_library(FlightTaskManualPosition
 target_link_libraries(FlightTaskManualPosition
 	PRIVATE
 		CollisionPrevention
-		WeatherVane
+		# WeatherVane
 	PUBLIC
 		FlightTaskManualAltitude
 )
