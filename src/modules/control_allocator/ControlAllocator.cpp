@@ -419,7 +419,7 @@ ControlAllocator::Run()
 	// ---------------------
 	input_rc_s input_rc;
 
-	static float const *previous_selected_values = nullptr;
+	// static float const *previous_selected_values = nullptr;
 	float const *selected_values = nullptr;
 
 	if (_input_rc_sub.update(&input_rc)) {
@@ -434,9 +434,9 @@ ControlAllocator::Run()
 			selected_values = values_90;
 		}
 
-		if ((input_rc.values[4] != _last_rc_input.values[4]) && (selected_values != previous_selected_values)) {
-			//PX4_INFO("RC input changed: Updating rotor positions. Value changed from %u to %u",
-             		//	_last_rc_input.values[4], input_rc.values[4]);
+		if ((input_rc.values[4] != _last_rc_input.values[4])) {
+			PX4_INFO("RC input changed: Updating rotor positions. Value changed from %u to %u",
+             			_last_rc_input.values[4], input_rc.values[4]);
 
 			for (int i = 0; i < 12; i++) {
 				param_t param_handle = param_find(param_names[i]);
@@ -463,7 +463,7 @@ ControlAllocator::Run()
 					PX4_ERR("Parameter %s not found", param_names[i]);
 				}
 			}
-			previous_selected_values = selected_values;
+			// previous_selected_values = selected_values;
 			do_update = true;
 		}
 		_last_rc_input = input_rc;
