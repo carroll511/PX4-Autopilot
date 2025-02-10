@@ -146,6 +146,58 @@ TEST(ControlAllocationTest, PseudoInverseAndNormalization)
 	constexpr size_t num_controls = 6;
 	constexpr size_t num_actuators = 4;
 
+	const float B_quad_w[6][16] = {
+		{-1.0073f,  1.0073f,  1.0073f, -1.0073f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+		{ 1.5177f, -2.0614f,  1.5177f, -2.0614f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+		{ 0.5366f,  0.5366f, -0.5366f, -0.5366f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+		{ -2.5352f,  2.5352f,  -2.5352f,  2.5352f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+		{ 0.f,  0.f,  0.f,  0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+		{-5.4367f, -5.4367f, -5.4367f, -5.4367f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f}
+	};
+
+	matrix::Matrix<float, 6, 16> B = matrix::Matrix<float, 6, 16>(B_quad_w);
+	matrix::Matrix<float, 6, 16> effectiveness_16;
+	// effectiveness_16(0, 0) = -1.0073246f; effectiveness_16(0, 1) = 1.0073246f; effectiveness_16(0, 2) = 1.0073246f;  effectiveness_16(0, 3) = -1.0073246f; effectiveness_16(0, 4) = 0.0f; effectiveness_16(0, 5) = 0.0f; effectiveness_16(0, 6) = 0.0f; effectiveness_16(0, 7) = 0.0f; effectiveness_16(0, 8) = 0.0f; effectiveness_16(0, 9) = 0.0f; effectiveness_16(0, 10) = 0.0f; effectiveness_16(0, 11) = 0.0f; effectiveness_16(0, 12) = 0.0f; effectiveness_16(0, 13) = 0.0f; effectiveness_16(0, 14) = 0.0f; effectiveness_16(0, 15) = 0.0f;
+	// effectiveness_16(1, 0) = 1.6425133f;  effectiveness_16(1, 1) = -2.29491f;  effectiveness_16(1, 2) = 1.6425133f;  effectiveness_16(1, 3) = -2.29491f; effectiveness_16(1, 4) = 0.0f; effectiveness_16(1, 5) = 0.0f; effectiveness_16(1, 6) = 0.0f; effectiveness_16(1, 7) = 0.0f; effectiveness_16(1, 8) = 0.0f; effectiveness_16(1, 9) = 0.0f; effectiveness_16(1, 10) = 0.0f; effectiveness_16(1, 11) = 0.0f; effectiveness_16(1, 12) = 0.0f; effectiveness_16(1, 13) = 0.0f; effectiveness_16(1, 14) = 0.0f; effectiveness_16(1, 15) = 0.0f;
+	// effectiveness_16(2, 0) = 0.53718674;  effectiveness_16(2, 1) = 0.53718674; effectiveness_16(2, 2) = -0.53718674; effectiveness_16(2, 3) = -0.53718674; effectiveness_16(2, 4) = 0.0f; effectiveness_16(2, 5) = 0.0f; effectiveness_16(2, 6) = 0.0f; effectiveness_16(2, 7) = 0.0f; effectiveness_16(2, 8) = 0.0f; effectiveness_16(2, 9) = 0.0f; effectiveness_16(2, 10) = 0.0f; effectiveness_16(2, 11) = 0.0f; effectiveness_16(2, 12) = 0.0f; effectiveness_16(2, 13) = 0.0f; effectiveness_16(2, 14) = 0.0f; effectiveness_16(2, 15) = 0.0f;
+	// effectiveness_16(3, 0) = -2.5382986;  effectiveness_16(3, 1) = 2.5382986;  effectiveness_16(3, 2) = -2.5382986;  effectiveness_16(3, 3) = 2.5382986; effectiveness_16(3, 4) = 0.0f; effectiveness_16(3, 5) = 0.0f; effectiveness_16(3, 6) = 0.0f; effectiveness_16(3, 7) = 0.0f; effectiveness_16(3, 8) = 0.0f; effectiveness_16(3, 9) = 0.0f; effectiveness_16(3, 10) = 0.0f; effectiveness_16(3, 11) = 0.0f; effectiveness_16(3, 12) = 0.0f; effectiveness_16(3, 13) = 0.0f; effectiveness_16(3, 14) = 0.0f; effectiveness_16(3, 15) = 0.0f;
+	// effectiveness_16(4, 0) = 0.0f;        effectiveness_16(4, 1) = 0.0f;       effectiveness_16(4, 2) = 0.0f;        effectiveness_16(4, 3) = 0.0f; effectiveness_16(4, 4) = 0.0f; effectiveness_16(4, 5) = 0.0f; effectiveness_16(4, 6) = 0.0f; effectiveness_16(4, 7) = 0.0f; effectiveness_16(4, 8) = 0.0f; effectiveness_16(4, 9) = 0.0f; effectiveness_16(4, 10) = 0.0f; effectiveness_16(4, 11) = 0.0f; effectiveness_16(4, 12) = 0.0f; effectiveness_16(4, 13) = 0.0f; effectiveness_16(4, 14) = 0.0f; effectiveness_16(4, 15) = 0.0f;
+	// effectiveness_16(5, 0) = -5.4366393;  effectiveness_16(5, 1) = -5.4366393; effectiveness_16(5, 2) = -5.4366393;  effectiveness_16(5, 3) = -5.4366393; effectiveness_16(5, 4) = 0.0f; effectiveness_16(5, 5) = 0.0f; effectiveness_16(5, 6) = 0.0f; effectiveness_16(5, 7) = 0.0f; effectiveness_16(5, 8) = 0.0f; effectiveness_16(5, 9) = 0.0f; effectiveness_16(5, 10) = 0.0f; effectiveness_16(5, 11) = 0.0f; effectiveness_16(5, 12) = 0.0f; effectiveness_16(5, 13) = 0.0f; effectiveness_16(5, 14) = 0.0f; effectiveness_16(5, 15) = 0.0f;
+
+	// 문제의 effectiveness matrix (지윤)
+	effectiveness_16(0, 0) = -1.0073f; effectiveness_16(0, 1) = 1.0073f; effectiveness_16(0, 2) = 1.0073f;  effectiveness_16(0, 3) = -1.0073f; effectiveness_16(0, 4) = 0.0f; effectiveness_16(0, 5) = 0.0f; effectiveness_16(0, 6) = 0.0f; effectiveness_16(0, 7) = 0.0f; effectiveness_16(0, 8) = 0.0f; effectiveness_16(0, 9) = 0.0f; effectiveness_16(0, 10) = 0.0f; effectiveness_16(0, 11) = 0.0f; effectiveness_16(0, 12) = 0.0f; effectiveness_16(0, 13) = 0.0f; effectiveness_16(0, 14) = 0.0f; effectiveness_16(0, 15) = 0.0f;
+	effectiveness_16(1, 0) = 1.5177f;  effectiveness_16(1, 1) = -2.0614f;  effectiveness_16(1, 2) = 1.5177f;  effectiveness_16(1, 3) = -2.0614f; effectiveness_16(1, 4) = 0.0f; effectiveness_16(1, 5) = 0.0f; effectiveness_16(1, 6) = 0.0f; effectiveness_16(1, 7) = 0.0f; effectiveness_16(1, 8) = 0.0f; effectiveness_16(1, 9) = 0.0f; effectiveness_16(1, 10) = 0.0f; effectiveness_16(1, 11) = 0.0f; effectiveness_16(1, 12) = 0.0f; effectiveness_16(1, 13) = 0.0f; effectiveness_16(1, 14) = 0.0f; effectiveness_16(1, 15) = 0.0f;
+	effectiveness_16(2, 0) = 0.5366f;  effectiveness_16(2, 1) = 0.5366f;  effectiveness_16(2, 2) = -0.5366f; effectiveness_16(2, 3) = -0.5366f; effectiveness_16(2, 4) = 0.0f; effectiveness_16(2, 5) = 0.0f; effectiveness_16(2, 6) = 0.0f; effectiveness_16(2, 7) = 0.0f; effectiveness_16(2, 8) = 0.0f; effectiveness_16(2, 9) = 0.0f; effectiveness_16(2, 10) = 0.0f; effectiveness_16(2, 11) = 0.0f; effectiveness_16(2, 12) = 0.0f; effectiveness_16(2, 13) = 0.0f; effectiveness_16(2, 14) = 0.0f; effectiveness_16(2, 15) = 0.0f;
+	effectiveness_16(3, 0) = -2.5352f; effectiveness_16(3, 1) = 2.5352f;  effectiveness_16(3, 2) = -2.5352f;  effectiveness_16(3, 3) = 2.5352f; effectiveness_16(3, 4) = 0.0f; effectiveness_16(3, 5) = 0.0f; effectiveness_16(3, 6) = 0.0f; effectiveness_16(3, 7) = 0.0f; effectiveness_16(3, 8) = 0.0f; effectiveness_16(3, 9) = 0.0f; effectiveness_16(3, 10) = 0.0f; effectiveness_16(3, 11) = 0.0f; effectiveness_16(3, 12) = 0.0f; effectiveness_16(3, 13) = 0.0f; effectiveness_16(3, 14) = 0.0f; effectiveness_16(3, 15) = 0.0f;
+	effectiveness_16(4, 0) = 0.0f;     effectiveness_16(4, 1) = 0.0f;       effectiveness_16(4, 2) = 0.0f;        effectiveness_16(4, 3) = 0.0f; effectiveness_16(4, 4) = 0.0f; effectiveness_16(4, 5) = 0.0f; effectiveness_16(4, 6) = 0.0f; effectiveness_16(4, 7) = 0.0f; effectiveness_16(4, 8) = 0.0f; effectiveness_16(4, 9) = 0.0f; effectiveness_16(4, 10) = 0.0f; effectiveness_16(4, 11) = 0.0f; effectiveness_16(4, 12) = 0.0f; effectiveness_16(4, 13) = 0.0f; effectiveness_16(4, 14) = 0.0f; effectiveness_16(4, 15) = 0.0f;
+	effectiveness_16(5, 0) = -5.4367f; effectiveness_16(5, 1) = -5.4367f; effectiveness_16(5, 2) = -5.4367f;  effectiveness_16(5, 3) = -5.4367f; effectiveness_16(5, 4) = 0.0f; effectiveness_16(5, 5) = 0.0f; effectiveness_16(5, 6) = 0.0f; effectiveness_16(5, 7) = 0.0f; effectiveness_16(5, 8) = 0.0f; effectiveness_16(5, 9) = 0.0f; effectiveness_16(5, 10) = 0.0f; effectiveness_16(5, 11) = 0.0f; effectiveness_16(5, 12) = 0.0f; effectiveness_16(5, 13) = 0.0f; effectiveness_16(5, 14) = 0.0f; effectiveness_16(5, 15) = 0.0f;
+
+
+	matrix::Matrix<float, 6, 4> effectiveness_64;
+	// effectiveness_64(0, 0) = -1.0073246f; effectiveness_64(0, 1) = 1.0073246f; effectiveness_64(0, 2) = 1.0073246f;  effectiveness_64(0, 3) = -1.0073246f;
+	// effectiveness_64(1, 0) = 1.6425133f;  effectiveness_64(1, 1) = -2.29491f;  effectiveness_64(1, 2) = 1.6425133f;  effectiveness_64(1, 3) = -2.29491f;
+	// effectiveness_64(2, 0) = 0.53718674;  effectiveness_64(2, 1) = 0.53718674; effectiveness_64(2, 2) = -0.53718674; effectiveness_64(2, 3) = -0.53718674;
+	// effectiveness_64(3, 0) = -2.5382986;  effectiveness_64(3, 1) = 2.5382986;  effectiveness_64(3, 2) = -2.5382986;  effectiveness_64(3, 3) = 2.5382986;
+	// effectiveness_64(4, 0) = 0.0f;        effectiveness_64(4, 1) = 0.0f;       effectiveness_64(4, 2) = 0.0f;        effectiveness_64(4, 3) = 0.0f;
+	// effectiveness_64(5, 0) = -5.4366393;  effectiveness_64(5, 1) = -5.4366393; effectiveness_64(5, 2) = -5.4366393;  effectiveness_64(5, 3) = -5.4366393;
+
+	// 문제의 eff mtrx
+	effectiveness_64(0, 0) = -1.0073f; effectiveness_64(0, 1) = 1.0073f; effectiveness_64(0, 2) = 1.0073f;  effectiveness_64(0, 3) = -1.0073f;
+	effectiveness_64(1, 0) = 1.5177f;  effectiveness_64(1, 1) = -2.0614f;  effectiveness_64(1, 2) = 1.5177f;  effectiveness_64(1, 3) = -2.0614f;
+	effectiveness_64(2, 0) = 0.5366f;  effectiveness_64(2, 1) = 0.5366f;  effectiveness_64(2, 2) = -0.5366f; effectiveness_64(2, 3) = -0.5366f;
+	effectiveness_64(3, 0) = -2.5352f; effectiveness_64(3, 1) = 2.5352f;  effectiveness_64(3, 2) = -2.5352f;  effectiveness_64(3, 3) = 2.5352f;
+	effectiveness_64(4, 0) = 0.0f;     effectiveness_64(4, 1) = 0.0f;       effectiveness_64(4, 2) = 0.0f;        effectiveness_64(4, 3) = 0.0f;
+	effectiveness_64(5, 0) = -5.4367f; effectiveness_64(5, 1) = -5.4367f; effectiveness_64(5, 2) = -5.4367f;  effectiveness_64(5, 3) = -5.4367f;
+
+
+	matrix::Matrix<float, 4, 6> pseudo_inverse_64;
+	geninv(effectiveness_64, pseudo_inverse_64);
+	std::cout << "pseudo_inverse_64: " << pseudo_inverse_64 << std::endl;
+
+
+
+
+
 	matrix::Matrix<float, num_controls, num_actuators> effectiveness;
 	effectiveness(0, 0) = -1.0073246f; effectiveness(0, 1) = 1.0073246f; effectiveness(0, 2) = 1.0073246f;  effectiveness(0, 3) = -1.0073246f;
 	effectiveness(1, 0) = 1.6425133f;  effectiveness(1, 1) = -2.29491f;  effectiveness(1, 2) = 1.6425133f;  effectiveness(1, 3) = -2.29491f;
@@ -165,6 +217,17 @@ TEST(ControlAllocationTest, PseudoInverseAndNormalization)
 	ex_pseudo_inverse(1, 0) = 0.24818216f;  ex_pseudo_inverse(1, 1) = -0.04930917f; ex_pseudo_inverse(1, 2) = 0.46538751f;  ex_pseudo_inverse(1, 3) = 0.06024684f;  ex_pseudo_inverse(1, 4) = 0.0f; ex_pseudo_inverse(1, 5) = -0.04302574;
 	ex_pseudo_inverse(2, 0) = 0.24818216f;  ex_pseudo_inverse(2, 1) = 0.04587143f;  ex_pseudo_inverse(2, 2) = -0.46538751f; ex_pseudo_inverse(2, 3) = -0.06291316f; ex_pseudo_inverse(2, 4) = 0.0f; ex_pseudo_inverse(2, 5) = -0.04873658f;
 	ex_pseudo_inverse(3, 0) = -0.24818216f; ex_pseudo_inverse(3, 1) = -0.04930917f; ex_pseudo_inverse(3, 2) = -0.46538751f; ex_pseudo_inverse(3, 3) = 0.06024684f;  ex_pseudo_inverse(3, 4) = 0.0f; ex_pseudo_inverse(3, 5) = -0.04302574;
+
+	matrix::Matrix<float, 16, 6> pseudo_inverse_16;
+	geninv(effectiveness_16, pseudo_inverse_16);
+	std::cout << "pseudo-inverse_16: " << pseudo_inverse_16 << std::endl;
+
+	std::cout << "effectiveness_16: " << effectiveness_16 << std::endl;
+	std::cout << "B: " << B << std::endl;
+
+	matrix::Matrix<float, 16, 6> pseudo_inverse_B;
+	geninv(B, pseudo_inverse_B);
+	std::cout << "pseudo-inverse_B: " << pseudo_inverse_B << std::endl;
 
 	matrix::Matrix<float, 4, 4> pseudo_inverse_no_xy;
 	geninv(effectiveness_no_xy, pseudo_inverse_no_xy);
