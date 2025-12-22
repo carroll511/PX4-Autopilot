@@ -108,3 +108,27 @@ src/systemcmds/topic_listener/listener_generated.cpp
 
 # colcon
 log/
+
+# submodules
+src/modules/uxrce_dds_client/Micro-XRCE-DDS-Client
+src/lib/crypto/libtommath
+src/lib/crypto/libtomcrypt
+src/lib/events/libevents
+src/lib/crypto/monocypher
+src/drivers/cyphal/legacy_data_types
+src/drivers/cyphal/public_regulated_data_types
+src/drivers/cyphal/libcanard
+
+Tools/simulation/jsbsim/jsbsim_bridge
+Tools/simulation/flightgear/flightgear_bridge
+
+platforms/nuttx/NuttX/apps
+platforms/nuttx/NuttX/nuttx
+
+src/drivers/gps/devices
+
+Tools/simulation/gazebo-classic/sitl_gazebo-classic
+Tools/simulation/jmavsim/jMAVSim
+
+src/drivers/uavcan/libuavcan
+src/modules/mavlink/mavlink
