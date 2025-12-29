@@ -172,4 +172,32 @@ TEST(MatrixPseudoInverseTest, PseudoInverse)
 	};
 	Matrix<float, 6, 5> real_pinv_expected(real_pinv_expected_alloc);
 	EXPECT_EQ(real_pinv, real_pinv_expected);
+
+	// coaxial test
+	const float coaxial_alloc[6][8] = {
+		{-0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f},
+		{0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f},
+		{-0.866025f, -0.866025f, -0.866025f, -0.866025f, -0.866025f, -0.866025f, -0.866025f, -0.866025f},
+		{-0.065933f, 0.065933f, 0.115933f, -0.115933f, 0.115933f, -0.115933f, -0.065933f, 0.065933f},
+		{0.090933f, 0.090933f, -0.090933f, -0.090933f, 0.090933f, 0.090933f, -0.090933f, -0.090933f},
+		{0.095801f, -0.095801f, -0.009199f, 0.009199f, -0.009199f, 0.009199f, 0.095801f, -0.095801f}
+	};
+	Matrix<float, 6, 8> coaxial(coaxial_alloc);
+	Matrix<float, 8, 6> coaxial_pinv;
+	EXPECT_TRUE(geninv(coaxial, coaxial_pinv));
+	
+	const float coaxial_expected_pinv[8][6] = {
+		{ -0.0625,   0.,      -0.108253,  0.218967,   1.374623, 2.760187},
+		{ -0.0625,   0.,      -0.108253,   -0.218967,   1.374623,  -2.760187},
+		{ -0.0625,   0.,      -0.108253,  2.2809,  -1.374623, 1.569724 },
+		{ -0.0625,   0.,      -0.108253,   -2.2809,  -1.374623, -1.569724 },
+		{ -0.0625,   0.,      -0.108253,  2.2809,    1.374623, 1.569724 },
+		{ -0.0625,   0.,      -0.108253,   -2.2809,    1.374623,  -1.569724 },
+		{ -0.0625,   0.,      -0.108253,  0.218967,   -1.374623, 2.760187},
+		{ -0.0625,   0.,      -0.108253,   -0.218967,   -1.374623,  2.760187}
+	};
+
+	Matrix<float, 8, 6> coaxial_pinv_expected(coaxial_expected_pinv);
+	EXPECT_TRUE(isEqual(coaxial_pinv, coaxial_pinv_expected, 3e-2f));
+	EXPECT_EQ(coaxial_pinv, coaxial_pinv_expected);
 }

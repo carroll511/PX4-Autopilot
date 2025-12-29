@@ -41,6 +41,7 @@
 
 #include <gtest/gtest.h>
 #include <ControlAllocationPseudoInverse.hpp>
+#include <ActuatorEffectiveness/ActuatorEffectivenessRotors.hpp>
 
 using namespace matrix;
 
@@ -66,4 +67,74 @@ TEST(ControlAllocationTest, AllZeroCase)
 
 	EXPECT_EQ(actuator_sp, actuator_sp_expected);
 	EXPECT_EQ(control_allocated, control_allocated_expected);
+}
+
+TEST(ControlAllocationTest, CoaxialGeometryEffectiveness)
+{
+	ActuatorEffectivenessRotors::Geometry g{};
+	const float L_x = 0.105f;                  // x arm length
+	const float L_y = 0.105f;                  // y arm length
+	const float ct = 1.0f;                     // thrust coef
+	const float km = 0.05f;                    // torque ratio
+	const float eta = 0.0f; // tilt angle in rad
+	const Vector3f axis{-sinf(eta), 0.f, -cosf(eta)};
+	const Vector3f axis_normalized = axis / axis.norm();
+
+	const Vector3f positions[8] = {
+		{ L_x,  L_y, 0.f},
+		{ L_x, -L_y, 0.f},
+		{-L_x, -L_y, 0.f},
+		{-L_x,  L_y, 0.f},
+		{ L_x, -L_y, 0.f},
+		{ L_x,  L_y, 0.f},
+		{-L_x,  L_y, 0.f},
+		{-L_x, -L_y, 0.f},
+	};
+
+	// Alternate moment_ratio sign to match CW/CCW prop pairs
+	for (int i = 0; i < 8; ++i) {
+		const float moment_ratio = (i % 2 == 0) ? km : -km;
+		g.rotors[i] = {positions[i], axis, ct, moment_ratio, -1};
+	}
+
+	g.num_rotors = 8;
+
+	matrix::Matrix<float, 6, 16> eff{};
+	int n = 0;
+
+	// Build effectiveness matrix the same way ActuatorEffectivenessRotors does
+	for (int i = 0; i < g.num_rotors; ++i) {
+		const float moment_ratio = (i % 2 == 0) ? km : -km;
+		const Vector3f thrust = ct * axis_normalized;
+		const Vector3f moment = ct * positions[i].cross(axis_normalized) - ct * moment_ratio * axis_normalized;
+
+		for (int j = 0; j < 3; ++j) {
+			eff(j, i) = moment(j);
+			eff(j + 3, i) = thrust(j);
+		}
+
+		++n;
+	}
+
+	ControlAllocationPseudoInverse alloc;
+	Vector<float, 16> trim{}, lin{};
+	alloc.setEffectivenessMatrix(eff, trim, lin, n, false);
+
+	// Show the generated effectiveness matrix (matching CA_ROTOR* geometry above)
+	printf("Effectiveness matrix (rows = actuators, cols = axes):\n");
+	eff.print();
+
+	ASSERT_EQ(n, 8);
+
+	// Verify the effectiveness matrix matches the configured geometry
+	for (int i = 0; i < n; ++i) {
+		const float moment_ratio = (i % 2 == 0) ? km : -km;
+		const Vector3f expected_thrust = ct * axis_normalized;
+		const Vector3f expected_moment = ct * positions[i].cross(axis_normalized) - ct * moment_ratio * axis_normalized;
+
+		for (int j = 0; j < 3; ++j) {
+			EXPECT_EQ(eff(j, i), expected_moment(j));
+			EXPECT_EQ(eff(j + 3, i), expected_thrust(j));
+		}
+	}
 }
