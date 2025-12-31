@@ -1,0 +1,852 @@
+<?xml version="1.0"?>
+<sdf version='1.9'>
+  <model name='carosh_no_legs'>
+    <self_collide>false</self_collide>
+    <pose>1.5 0 0.2 0 0 0</pose>
+    <static>false</static>
+
+    <!-- Base Link -->
+    <link name='base_link'>
+      <inertial>
+        <mass>2.326</mass>
+        <inertia>
+          <ixx>0.024114</ixx>
+          <iyy>0.017330</iyy>
+          <izz>0.038110</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <velocity_decay/>
+
+      <collision name='base_link_collision'>
+        <geometry>
+          <box>
+            <size>0.37 0.37 0.067</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name='base_link_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/body.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <!-- IMU Sensor -->
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>250</update_rate>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.00018665</stddev>
+                <dynamic_bias_stddev>3.8785e-05</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>1000</dynamic_bias_correlation_time>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.00018665</stddev>
+                <dynamic_bias_stddev>3.8785e-05</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>1000</dynamic_bias_correlation_time>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.00018665</stddev>
+                <dynamic_bias_stddev>3.8785e-05</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>1000</dynamic_bias_correlation_time>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.00186</stddev>
+                <dynamic_bias_stddev>0.006</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>300</dynamic_bias_correlation_time>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.00186</stddev>
+                <dynamic_bias_stddev>0.006</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>300</dynamic_bias_correlation_time>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.00186</stddev>
+                <dynamic_bias_stddev>0.006</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>300</dynamic_bias_correlation_time>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+
+      <!-- Barometer -->
+      <sensor name="air_pressure_sensor" type="air_pressure">
+        <always_on>true</always_on>
+        <update_rate>50</update_rate>
+        <air_pressure>
+          <pressure>
+            <noise type="gaussian">
+              <mean>0</mean>
+              <stddev>0.01</stddev>
+            </noise>
+          </pressure>
+        </air_pressure>
+      </sensor>
+
+      <!-- Magnetometer -->
+      <sensor name="magnetometer_sensor" type="magnetometer">
+        <always_on>true</always_on>
+        <update_rate>80</update_rate>
+        <plugin
+          filename="gz-sim-magnetometer-system"
+          name="gz::sim::systems::Magnetometer">
+        </plugin>
+      </sensor>
+
+      <!-- GPS Sensor -->
+      <sensor name="gps_sensor" type="gps">
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <plugin
+          filename="gz-sim-navsat-system"
+          name="gz::sim::systems::NavSat">
+        </plugin>
+      </sensor>
+    </link>
+
+    <!-- Tilt links -->
+    <link name='front_tilt'>
+      <pose relative_to='front_tilt_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.213</mass>
+        <inertia>
+          <ixx>0.002205</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000090</iyy>
+          <iyz>0</iyz>
+          <izz>0.002261</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='front_tilt_visual'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://carosh/meshes/tilt.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='front_tilt_collision'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://carosh/meshes/tilt.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='front_tilt_joint' type='revolute'>
+      <pose relative_to='base_link'>0.105 0 0 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>front_tilt</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.5708</lower>
+          <upper>1.5708</upper>
+          <effort>10</effort>
+          <velocity>5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.01</damping>
+          <friction>0.0</friction>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_tilt'>
+      <pose relative_to='rear_tilt_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.213</mass>
+        <inertia>
+          <ixx>0.002205</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000090</iyy>
+          <iyz>0</iyz>
+          <izz>0.002261</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='rear_tilt_visual'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://carosh/meshes/tilt.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Green</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='rear_tilt_collision'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://carosh/meshes/tilt.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='rear_tilt_joint' type='revolute'>
+      <pose relative_to='base_link'>-0.105 0 0 0 0 3.1416</pose>
+      <parent>base_link</parent>
+      <child>rear_tilt</child>
+      <axis>
+        <xyz>0 -1 0</xyz>
+        <limit>
+          <lower>-1.5708</lower>
+          <upper>1.5708</upper>
+          <effort>10</effort>
+          <velocity>5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.01</damping>
+          <friction>0.0</friction>
+        </dynamics>
+      </axis>
+    </joint>
+    <!-- Propellers -->
+    <!-- Rotor 0 -->
+    <link name='front_right_upper_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='front_right_upper_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='front_right_upper_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='front_right_upper_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='front_right_upper_rotor_joint' type='revolute'>
+      <pose relative_to='front_tilt'>0 -0.10625 0.03 0 0 0</pose>
+      <parent>front_tilt</parent>
+      <child>front_right_upper_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 1 -->
+    <link name='front_left_upper_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='front_left_upper_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='front_left_upper_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Orange</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='front_left_upper_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='front_left_upper_rotor_joint' type='revolute'>
+      <pose relative_to='front_tilt'>0 0.10625 0.03 0 0 0</pose>
+      <parent>front_tilt</parent>
+      <child>front_left_upper_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 2 -->
+    <link name='rear_left_upper_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='rear_left_upper_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='rear_left_upper_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Yellow</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='rear_left_upper_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='rear_left_upper_rotor_joint' type='revolute'>
+      <pose relative_to='rear_tilt'>0 -0.10625 0.03 0 0 0</pose>
+      <parent>rear_tilt</parent>
+      <child>rear_left_upper_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 3 -->
+    <link name='rear_right_upper_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='rear_right_upper_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='rear_right_upper_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Green</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='rear_right_upper_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='rear_right_upper_rotor_joint' type='revolute'>
+      <pose relative_to='rear_tilt'>0 0.10625 0.03 0 0 0</pose>
+      <parent>rear_tilt</parent>
+      <child>rear_right_upper_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 4 -->
+    <link name='front_left_lower_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='front_left_lower_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='front_left_lower_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='front_left_lower_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='front_left_lower_rotor_joint' type='revolute'>
+      <pose relative_to='front_tilt'>0 0.10625 -0.03 0 0 0</pose>
+      <parent>front_tilt</parent>
+      <child>front_left_lower_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 5 -->
+    <link name='front_right_lower_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='front_right_lower_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='front_right_lower_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Purple</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='front_right_lower_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='front_right_lower_rotor_joint' type='revolute'>
+      <pose relative_to='front_tilt'>0 -0.10625 -0.03 0 0 0</pose>
+      <parent>front_tilt</parent>
+      <child>front_right_lower_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 6 -->
+    <link name='rear_right_lower_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='rear_right_lower_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='rear_right_lower_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='rear_right_lower_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_ccw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='rear_right_lower_rotor_joint' type='revolute'>
+      <pose relative_to='rear_tilt'>0 0.10625 -0.03 0 0 0</pose>
+      <parent>rear_tilt</parent>
+      <child>rear_right_lower_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Rotor 7 -->
+    <link name='rear_left_lower_rotor'>
+      <gravity>true</gravity>
+      <velocity_decay/>
+      <pose relative_to='rear_left_lower_rotor_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.6e-7</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.6e-7</iyy>
+          <iyz>0</iyz>
+          <izz>1.9e-6</izz>
+        </inertia>
+      </inertial>
+      <gravity>true</gravity>
+      <visual name='rear_left_lower_rotor_visual'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <collision name='rear_left_lower_rotor_collision'>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://carosh/meshes/5045_cw.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <joint name='rear_left_lower_rotor_joint' type='revolute'>
+      <pose relative_to='rear_tilt'>0 -0.10625 -0.03 0 0 0</pose>
+      <parent>rear_tilt</parent>
+      <child>rear_left_lower_rotor</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+
+    <!-- Motor Plugins -->
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>front_right_upper_rotor_joint</jointName>
+      <linkName>front_right_upper_rotor</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>front_left_upper_rotor_joint</jointName>
+      <linkName>front_left_upper_rotor</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rear_left_upper_rotor_joint</jointName>
+      <linkName>rear_left_upper_rotor</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rear_right_upper_rotor_joint</jointName>
+      <linkName>rear_right_upper_rotor</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>front_left_lower_rotor_joint</jointName>
+      <linkName>front_left_lower_rotor</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>4</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>front_right_lower_rotor_joint</jointName>
+      <linkName>front_right_lower_rotor</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>5</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rear_right_lower_rotor_joint</jointName>
+      <linkName>rear_right_lower_rotor</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>6</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+      <jointName>rear_left_lower_rotor_joint</jointName>
+      <linkName>rear_left_lower_rotor</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1000.0</maxRotVelocity>
+      <motorConstant>8.5458e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>command/motor_speed</commandSubTopic>
+      <motorNumber>7</motorNumber>
+      <rotorDragCoefficient>0.000175</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorType>velocity</motorType>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>front_tilt_joint</joint_name>
+      <sub_topic>servo_0</sub_topic>
+      <p_gain>10.0</p_gain>
+    </plugin>
+
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>rear_tilt_joint</joint_name>
+      <sub_topic>servo_1</sub_topic>
+      <p_gain>10.0</p_gain>
+      <multiplier>-1.0</multiplier>
+    </plugin>
+
+  </model>
+</sdf>

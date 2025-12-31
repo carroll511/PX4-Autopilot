@@ -96,4 +96,5 @@ px4_add_romfs_files(
 	17002_flightgear_tf-g2
 
 	77000_gz_carosh
+	77100_gz_carosh_no_legs
 )
