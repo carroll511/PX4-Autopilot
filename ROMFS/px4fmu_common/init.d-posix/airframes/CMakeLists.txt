@@ -97,4 +97,6 @@ px4_add_romfs_files(
 
 	77000_gz_carosh
 	77100_gz_carosh_no_legs
+
+	88000_gz_omnidirectional
 )
