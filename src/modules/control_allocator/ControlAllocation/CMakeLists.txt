@@ -38,8 +38,8 @@ px4_add_library(ControlAllocation
 	ControlAllocationPseudoInverse.hpp
 	ControlAllocationSequentialDesaturation.cpp
 	ControlAllocationSequentialDesaturation.hpp
-	ControlAllocationDecomposedForce.cpp
-	ControlAllocationDecomposedForce.hpp
+	ControlAllocationStatic.cpp
+	ControlAllocationStatic.hpp
 )
 target_compile_options(ControlAllocation PRIVATE ${MAX_CUSTOM_OPT_LEVEL})
 target_include_directories(ControlAllocation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

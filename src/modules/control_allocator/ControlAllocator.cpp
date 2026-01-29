@@ -187,6 +187,10 @@ ControlAllocator::update_allocation_method(bool force)
 				_control_allocation[i] = new ControlAllocationSequentialDesaturation();
 				break;
 
+			case AllocationMethod::STATIC_ALLOCATION:
+				_control_allocation[i] = new ControlAllocationStatic();
+				break;
+				
 			default:
 				PX4_ERR("Unknown allocation method");
 				break;
@@ -260,6 +264,10 @@ ControlAllocator::update_effectiveness_source()
 
 		case EffectivenessSource::HELICOPTER:
 			tmp = new ActuatorEffectivenessHelicopter(this);
+			break;
+
+		case EffectivenessSource::OMNIDIRECTIONAL:
+			tmp = new ActuatorEffectivenessOmnidirectional(this);
 			break;
 
 		default:
@@ -678,16 +686,65 @@ ControlAllocator::publish_actuator_controls()
 	if (_num_actuators[1] > 0) {
 		int servos_idx;
 
-		for (servos_idx = 0; servos_idx < _num_actuators[1] && servos_idx < actuator_servos_s::NUM_CONTROLS; servos_idx++) {
-			int selected_matrix = _control_allocation_selection_indexes[actuator_idx];
-			float actuator_sp = _control_allocation[selected_matrix]->getActuatorSetpoint()(actuator_idx_matrix[selected_matrix]);
-			actuator_servos.control[servos_idx] = PX4_ISFINITE(actuator_sp) ? actuator_sp : NAN;
-			++actuator_idx_matrix[selected_matrix];
-			++actuator_idx;
-		}
+		// Check if using StaticAllocation and publish motor angles (alpha_i) as servo commands
+		if (_allocation_method_id == AllocationMethod::STATIC_ALLOCATION && _num_control_allocation > 0) {
+			// Safe to cast since we've verified the allocation method
+			ControlAllocationStatic *static_alloc = static_cast<ControlAllocationStatic *>(_control_allocation[0]);
+			
+			if (static_alloc != nullptr) {
+				// Get servo angles for 4 motor pairs: (1,6), (2,5), (4,8), (3,7)
+				// These are in radians, need to normalize to [-1, 1] for PX4 servos
+				float servo_angles[4];
+				static_alloc->getServoAngles(servo_angles);
+				
+				// Publish 4 servo commands (one per motor pair)
+				// Servos expect values in [-1, 1] range
+				// Map servo angles from [-π, π] to [-1, 1]
+				const float pi_f = (float)M_PI;
+				int num_servos = (_num_actuators[1] < 4) ? _num_actuators[1] : 4;
+				for (servos_idx = 0; servos_idx < num_servos && servos_idx < actuator_servos_s::NUM_CONTROLS; servos_idx++) {
+					if (PX4_ISFINITE(servo_angles[servos_idx])) {
+						// Normalize from [-π, π] to [-1, 1]
+						actuator_servos.control[servos_idx] = servo_angles[servos_idx] / pi_f;
+						// Clamp to [-1, 1] to be safe
+						if (actuator_servos.control[servos_idx] > 1.0f) actuator_servos.control[servos_idx] = 1.0f;
+						if (actuator_servos.control[servos_idx] < -1.0f) actuator_servos.control[servos_idx] = -1.0f;
+					} else {
+						actuator_servos.control[servos_idx] = NAN;
+					}
+				}
+				
+				// Fill remaining servo slots with NAN
+				for (int i = servos_idx; i < actuator_servos_s::NUM_CONTROLS; i++) {
+					actuator_servos.control[i] = NAN;
+				}
+			} else {
+				// Fall back to normal servo publishing
+				for (servos_idx = 0; servos_idx < _num_actuators[1] && servos_idx < actuator_servos_s::NUM_CONTROLS; servos_idx++) {
+					int selected_matrix = _control_allocation_selection_indexes[actuator_idx];
+					float actuator_sp = _control_allocation[selected_matrix]->getActuatorSetpoint()(actuator_idx_matrix[selected_matrix]);
+					actuator_servos.control[servos_idx] = PX4_ISFINITE(actuator_sp) ? actuator_sp : NAN;
+					++actuator_idx_matrix[selected_matrix];
+					++actuator_idx;
+				}
 
-		for (int i = servos_idx; i < actuator_servos_s::NUM_CONTROLS; i++) {
-			actuator_servos.control[i] = NAN;
+				for (int i = servos_idx; i < actuator_servos_s::NUM_CONTROLS; i++) {
+					actuator_servos.control[i] = NAN;
+				}
+			}
+		} else {
+			// Normal servo publishing for non-StaticAllocation methods
+			for (servos_idx = 0; servos_idx < _num_actuators[1] && servos_idx < actuator_servos_s::NUM_CONTROLS; servos_idx++) {
+				int selected_matrix = _control_allocation_selection_indexes[actuator_idx];
+				float actuator_sp = _control_allocation[selected_matrix]->getActuatorSetpoint()(actuator_idx_matrix[selected_matrix]);
+				actuator_servos.control[servos_idx] = PX4_ISFINITE(actuator_sp) ? actuator_sp : NAN;
+				++actuator_idx_matrix[selected_matrix];
+				++actuator_idx;
+			}
+
+			for (int i = servos_idx; i < actuator_servos_s::NUM_CONTROLS; i++) {
+				actuator_servos.control[i] = NAN;
+			}
 		}
 
 		_actuator_servos_pub.publish(actuator_servos);
@@ -785,6 +842,10 @@ int ControlAllocator::print_status()
 		PX4_INFO("Method: Sequential desaturation");
 		break;
 
+	case AllocationMethod::STATIC_ALLOCATION:
+		PX4_INFO("Method: Static Allocation");
+		break;
+
 	case AllocationMethod::AUTO:
 		PX4_INFO("Method: Auto");
 		break;
@@ -797,14 +858,33 @@ int ControlAllocator::print_status()
 
 	// Print current effectiveness matrix
 	for (int i = 0; i < _num_control_allocation; ++i) {
-		const ActuatorEffectiveness::EffectivenessMatrix &effectiveness = _control_allocation[i]->getEffectivenessMatrix();
-
 		if (_num_control_allocation > 1) {
 			PX4_INFO("Instance: %i", i);
 		}
 
-		PX4_INFO("  Effectiveness.T =");
-		effectiveness.T().print();
+		// For StaticAllocation, print the internal static matrix instead
+		if (_allocation_method_id == AllocationMethod::STATIC_ALLOCATION) {
+			ControlAllocationStatic *static_alloc = static_cast<ControlAllocationStatic *>(_control_allocation[i]);
+			
+			if (static_alloc != nullptr) {
+				const float *arm_angles = static_alloc->getArmAngles();
+				float l, k;
+				static_alloc->getParameters(l, k);
+				
+				PX4_INFO("  Static Allocation Matrix A_static (6x16):");
+				static_alloc->getStaticMatrix().print();
+				PX4_INFO("  Static Allocation Matrix A_static_inv (16x6):");
+				static_alloc->getStaticMatrixInv().print();
+				PX4_INFO("  Arm angles (theta): [%.3f, %.3f, %.3f, %.3f] rad",
+					(double)arm_angles[0], (double)arm_angles[1], (double)arm_angles[2], (double)arm_angles[3]);
+				PX4_INFO("  Parameters: l=%.3f, k=%.3f", (double)l, (double)k);
+			}
+		} else {
+			const ActuatorEffectiveness::EffectivenessMatrix &effectiveness = _control_allocation[i]->getEffectivenessMatrix();
+			PX4_INFO("  Effectiveness.T =");
+			effectiveness.T().print();
+		}
+
 		PX4_INFO("  minimum =");
 		_control_allocation[i]->getActuatorMin().T().print();
 		PX4_INFO("  maximum =");

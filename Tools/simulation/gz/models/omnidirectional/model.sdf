@@ -169,7 +169,7 @@
       </collision>
     </link>
     <joint name='front_right_tilt_joint' type='revolute'>
-      <pose relative_to='base_link'>0.129026186608 -0.125026186608 -0.028 0 0 0.785398</pose>
+      <pose relative_to='base_link'>0.179137 -0.174541 0 0 0 0.785398</pose>
       <parent>base_link</parent>
       <child>front_right_tilt</child>
       <axis>
@@ -225,11 +225,11 @@
       </collision>
     </link>
     <joint name='front_left_tilt_joint' type='revolute'>
-      <pose relative_to='base_link'>0.125026186608 0.129026186608 -0.028 0 0 2.35619</pose>
+      <pose relative_to='base_link'>0.174541 0.179137 0 0 0 2.35619</pose>
       <parent>base_link</parent>
       <child>front_left_tilt</child>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>0 1 0</xyz>
         <limit>
           <lower>-1.5708</lower>
           <upper>1.5708</upper>
@@ -281,11 +281,11 @@
       </collision>
     </link>
     <joint name='rear_left_tilt_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.129026186608 0.125026186608 -0.028 0 0 -2.35619</pose>
+      <pose relative_to='base_link'>-0.179137 0.174541  0 0 0 -2.35619</pose>
       <parent>base_link</parent>
       <child>rear_left_tilt</child>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>0 1 0</xyz>
         <limit>
           <lower>-1.5708</lower>
           <upper>1.5708</upper>
@@ -337,11 +337,11 @@
       </collision>
     </link>
     <joint name='rear_right_tilt_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.125026186608 -0.129026186608 -0.028 0 0 -0.785398</pose>
+      <pose relative_to='base_link'>-0.174541 -0.179137 0 0 0 -0.785398</pose>
       <parent>base_link</parent>
       <child>rear_right_tilt</child>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>0 1 0</xyz>
         <limit>
           <lower>-1.5708</lower>
           <upper>1.5708</upper>
@@ -397,7 +397,7 @@
         </collision>
     </link>
     <joint name='front_right_upper_rotor_joint' type='revolute'>
-        <pose relative_to='front_right_tilt'>-0.000299597181 -0.190299597181 0.09755 0 0 0</pose>
+        <pose relative_to='front_right_tilt'>0 -0.114545 0.049545 0 0 0</pose>
         <parent>front_right_tilt</parent>
         <child>front_right_upper_rotor</child>
         <axis>
@@ -453,7 +453,7 @@
         </collision>
     </link>
     <joint name='front_left_upper_rotor_joint' type='revolute'>
-        <pose relative_to='front_left_tilt'>-0.000299597181 -0.190299597181 0.09755 0 0 0</pose>
+        <pose relative_to='front_left_tilt'>0 -0.114545 0.049545 0 0 0</pose>
         <parent>front_left_tilt</parent>
         <child>front_left_upper_rotor</child>
         <axis>
@@ -509,7 +509,7 @@
         </collision>
     </link>
     <joint name='rear_left_upper_rotor_joint' type='revolute'>
-        <pose relative_to='rear_left_tilt'>-0.000299597181 -0.190299597181 0.09755 0 0 0</pose>
+        <pose relative_to='rear_left_tilt'>0 -0.114545 0.049545 0 0 0</pose>
         <parent>rear_left_tilt</parent>
         <child>rear_left_upper_rotor</child>
         <axis>
@@ -565,7 +565,7 @@
         </collision>
     </link>
     <joint name='rear_right_upper_rotor_joint' type='revolute'>
-        <pose relative_to='rear_right_tilt'>-0.000299597181 -0.190299597181 0.09755 0 0 0</pose>
+        <pose relative_to='rear_right_tilt'>0 -0.114545 0.049545 0 0 0</pose>
         <parent>rear_right_tilt</parent>
         <child>rear_right_upper_rotor</child>
         <axis>
@@ -622,7 +622,7 @@
         </collision>
     </link>
     <joint name='front_left_lower_rotor_joint' type='revolute'>
-        <pose relative_to='front_left_tilt'>-0.000299597181 -0.190299597181 0.002 0 0 0</pose>
+        <pose relative_to='front_left_tilt'>0 -0.114545 -0.049545 0 0 0</pose>
         <parent>front_left_tilt</parent>
         <child>front_left_lower_rotor</child>
         <axis>
@@ -678,7 +678,7 @@
         </collision>
     </link>
     <joint name='front_right_lower_rotor_joint' type='revolute'>
-        <pose relative_to='front_right_tilt'>-0.000299597181 -0.190299597181 0.002 0 0 0</pose>
+        <pose relative_to='front_right_tilt'>0 -0.114545 -0.049545 0 0 0</pose>
         <parent>front_right_tilt</parent>
         <child>front_right_lower_rotor</child>
         <axis>
@@ -734,7 +734,7 @@
         </collision>
     </link>
     <joint name='rear_right_lower_rotor_joint' type='revolute'>
-        <pose relative_to='rear_right_tilt'>-0.000299597181 -0.190299597181 0.002 0 0 0</pose>
+        <pose relative_to='rear_right_tilt'>0 -0.114545 -0.049545 0 0 0</pose>
         <parent>rear_right_tilt</parent>
         <child>rear_right_lower_rotor</child>
         <axis>
@@ -790,7 +790,7 @@
         </collision>
     </link>
     <joint name='rear_left_lower_rotor_joint' type='revolute'>
-        <pose relative_to='rear_left_tilt'>-0.000299597181 -0.190299597181 0.002 0 0 0</pose>
+        <pose relative_to='rear_left_tilt'>0 -0.114545 -0.049545 0 0 0</pose>
         <parent>rear_left_tilt</parent>
         <child>rear_left_lower_rotor</child>
         <axis>

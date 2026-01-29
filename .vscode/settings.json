@@ -127,5 +127,18 @@
         "terminal.integrated.scrollback": 15000,
         "yaml.schemas": {
                 "${workspaceFolder}/validation/module_schema.yaml": "${workspaceFolder}/src/modules/*/module.yaml"
-        }
+        },
+        "ROS2.distro": "humble",
+        "python.autoComplete.extraPaths": [
+                "/opt/ros/humble/lib/python3.10/site-packages",
+                "/opt/ros/humble/local/lib/python3.10/dist-packages",
+                "/home/carroll/isaaclab/DEX_RL_LAB",
+                "/home/carroll/isaaclab/IsaacLab/source/isaaclab"
+        ],
+        "python.analysis.extraPaths": [
+                "/opt/ros/humble/lib/python3.10/site-packages",
+                "/opt/ros/humble/local/lib/python3.10/dist-packages",
+                "/home/carroll/isaaclab/DEX_RL_LAB",
+                "/home/carroll/isaaclab/IsaacLab/source/isaaclab"
+        ]
 }

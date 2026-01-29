@@ -48,6 +48,8 @@ px4_add_library(ActuatorEffectiveness
 	ActuatorEffectivenessMCTilt.hpp
 	ActuatorEffectivenessMultirotor.cpp
 	ActuatorEffectivenessMultirotor.hpp
+	ActuatorEffectivenessOmnidirectional.cpp
+	ActuatorEffectivenessOmnidirectional.hpp
 	ActuatorEffectivenessTilts.cpp
 	ActuatorEffectivenessTilts.hpp
 	ActuatorEffectivenessRotors.cpp
@@ -62,9 +64,6 @@ px4_add_library(ActuatorEffectiveness
 	ActuatorEffectivenessRoverAckermann.cpp
 	ActuatorEffectivenessRoverDifferential.hpp
 	ActuatorEffectivenessRoverDifferential.cpp
-
-	ActuatorEffecitvenessOmnidirectional.cpp
-	ActuatorEffecitvenessOmnidirectional.hpp
 )
 
 target_compile_options(ActuatorEffectiveness PRIVATE ${MAX_CUSTOM_OPT_LEVEL})
