@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @name Omnidirectional Tilt Coaxial Quadcopter (GZ)
+# @name Tilt Coaxial Quadcopter (GZ)
 #
 # @type Octorotor Coaxial
 # @class Copter
@@ -26,7 +26,7 @@
 
 PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
 PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
-PX4_SIM_MODEL=${PX4_SIM_MODEL:=omnidirectional}
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=voliro}
 
 param set-default SIM_GZ_EN 1
 
@@ -37,7 +37,7 @@ param set-default SENS_EN_MAGSIM 1
 param set-default MAV_TYPE 2
 
 param set-default CA_AIRFRAME 11
-param set-default CA_METHOD 3
+param set-default CA_METHOD 2
 param set-default CA_ROTOR_COUNT 8
 
 param set-default CA_ROTOR0_PX 0.257
@@ -81,12 +81,21 @@ param set-default SIM_GZ_EC_FUNC6 106
 param set-default SIM_GZ_EC_FUNC7 107
 param set-default SIM_GZ_EC_FUNC8 108
 
-param set-default CA_SV_CS_COUNT 4
+param set-default CA_SV_TL_COUNT 4
 
 param set-default SIM_GZ_SV_FUNC1 201
 param set-default SIM_GZ_SV_FUNC2 202
 param set-default SIM_GZ_SV_FUNC3 203
 param set-default SIM_GZ_SV_FUNC4 204
+
+param set-default CA_SV_TL0_MAXA 60
+param set-default CA_SV_TL0_MINA -60
+param set-default CA_SV_TL1_MAXA 60
+param set-default CA_SV_TL1_MINA -60
+param set-default CA_SV_TL2_MAXA 60
+param set-default CA_SV_TL2_MINA -60
+param set-default CA_SV_TL3_MAXA 60
+param set-default CA_SV_TL3_MINA -60
 
 param set-default SIM_GZ_EC_DIS1 150
 param set-default SIM_GZ_EC_DIS2 150
